@@ -1,6 +1,7 @@
 package com.example.mystore.ui.theme.screen
 
 import android.service.quickaccesswallet.WalletCard
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -15,18 +16,22 @@ import com.example.mystore.model.Producto
 import com.example.mystore.viewModel.HomeViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.ui.modifier.modifierLocalMapOf
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
 
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = viewModel()){
+fun HomeScreen(viewModel: HomeViewModel = viewModel(), navController: NavController){
+
     val producto by viewModel.producto.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val cartCount by viewModel.carItemCount.collectAsState()
 
     Scaffold(
-        topBar = { TopBar(cartCount = cartCount)}
+        topBar = { TopBar(cartCount = cartCount, navController = navController)}
     ){ paddingValues ->
         Box(modifier = Modifier.padding(paddingValues).fillMaxSize()){
             if (isLoading){
@@ -34,7 +39,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()){
             }else{
                 LazyColumn(contentPadding = PaddingValues(16.dp)){
                     items(producto){ producto->
-                        ProductCard(producto = producto, onAddToCard = {viewModel.agregarCarrito(producto) })
+                        ProductCard(producto = producto, onAddToCart = {viewModel.agregarCarrito(producto) })
                         Spacer(Modifier.height(8.dp))
                     }
                 }
@@ -45,11 +50,19 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel()){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(cartCount: Int){
+fun TopBar(cartCount: Int, navController: NavController){
     TopAppBar(
-        title = {Text("HiloHub")},
+        title = {Text("KatHub")},
+        navigationIcon = {
+            IconButton(onClick = {navController.navigate("Login")}) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                    contentDescription = "Cerrar sesión"
+                )
+            }
+        },
         actions = {
-            IconButton(onClick = {/*navega al carrito de compras*/}) {
+            IconButton(onClick = {navController.navigate("Carrito")}) {
                 BadgedBox(
                     badge = {
                         if (cartCount > 0){
@@ -64,19 +77,39 @@ fun TopBar(cartCount: Int){
     )
 }
 @Composable
-fun ProductCard(producto: Producto, onAddToCard: (Producto)-> Unit){
+fun ProductCard(producto: Producto, onAddToCart: (Producto)-> Unit){
     Card (
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ){
-        Column(modifier = Modifier.padding(16.dp)){
-            Text(producto.nombre, style = MaterialTheme.typography.titleLarge)
-            Spacer(Modifier.height(4.dp))
-            Text("${producto.precio}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-            Spacer(Modifier.height(8.dp))
-            Text(producto.descripcion, style = MaterialTheme.typography.bodyMedium)
+        Column(modifier = Modifier.padding(16.dp)
+        ){
+            Image(
+                painter = painterResource(id = producto.imagen),
+                contentDescription = producto.nombre,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .padding(bottom = 8.dp),
+                contentScale = ContentScale.Crop
+            )
+            Text(producto.nombre,
+                style = MaterialTheme.typography.titleLarge)
 
-            Button(onClick = {onAddToCard(producto)}, modifier = Modifier.align(Alignment.End)) {
+            Spacer(Modifier.height(4.dp))
+
+            Text("${producto.precio}",
+                style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(producto.descripcion,
+                style = MaterialTheme.typography.bodyMedium)
+
+            Button(
+                onClick = {onAddToCart(producto)},
+                modifier = Modifier.align(Alignment.Start)
+            ) {
                 Text("Añadir al carrito")
             }
         }

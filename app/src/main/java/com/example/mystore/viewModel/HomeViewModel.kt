@@ -20,9 +20,10 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
     val producto: StateFlow<List<Producto>> = _productos.asStateFlow()
 
     private val _carItem = MutableStateFlow<List<CarItem>>(emptyList())
+    val carItem: StateFlow<List<CarItem>> = _carItem
     val carItemCount: StateFlow<Int> = _carItem.map { it.sumOf { item -> item.quantity } }.stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.WhileSubscribed(1000),
         initialValue = 0
     )
     private val _isLoading = MutableStateFlow(false)
@@ -57,5 +58,10 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
             currentItems.add(CarItem(producto, 1))
         }
         _carItem.value = currentItems
+    }
+    fun eliminarDelCarrito(producto: Producto){
+        val currentItems = _carItem.value.toMutableList()
+        val updateItems = currentItems.filterNot {it.producto.id == producto.id}
+        _carItem.value = updateItems
     }
 }

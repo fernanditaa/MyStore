@@ -4,21 +4,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mystore.ui.theme.MyStoreTheme
+import com.example.mystore.ui.theme.screen.CartScreen
 import com.example.mystore.ui.theme.screen.HomeScreen
+import com.example.mystore.ui.theme.screen.LoginScreen
 import com.example.mystore.ui.theme.screen.WelcomeScreen
-
+import com.example.mystore.viewModel.HomeViewModel
+import com.example.mystore.R
+// Aca manejamos las rutas, donde nos lleva cada pagina
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,15 +30,36 @@ class MainActivity : ComponentActivity() {
             MyStoreTheme {
                 val  navController = rememberNavController()
 
-                NavHost(
-                    navController = navController,
-                    startDestination = "Welcome"){
-                    composable("Welcome"){
-                        WelcomeScreen(navController = navController)
-                    }
+                val sharedHomeViewModel: HomeViewModel = viewModel()
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ){
+                    Image(
+                        painter = painterResource(id = R.drawable.imagen1),
+                        contentDescription = "Fondo de la tienda",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        alpha = 0.3f //hacemos la imagen mas transparente
+                    )
+                    NavHost(
+                        navController = navController,
+                        startDestination = "welcome")
+                    {
+                        composable("welcome"){
+                            WelcomeScreen(navController = navController)
+                        }
 
-                    composable("Home"){
-                        HomeScreen(viewModel = viewModel ())
+                        composable("login"){
+                            LoginScreen(navController = navController)
+
+                        }
+                        composable("home"){
+                            HomeScreen(viewModel = sharedHomeViewModel, navController = navController)
+                        }
+
+                        composable("carrito") {
+                            CartScreen(navController = navController, viewModel = sharedHomeViewModel)
+                        }
                     }
                 }
             }

@@ -1,10 +1,13 @@
 package com.example.mystore.ui.theme.screen
 
+import android.R
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -15,12 +18,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.mystore.viewModel.HomeViewModel
 
 
 @Composable
-fun ResistroScreen() {
+fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewModel = viewModel()) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
@@ -37,13 +45,18 @@ fun ResistroScreen() {
     //con esto validamos que el correo sea valido
     val emailRegex = Regex("^[\\w.-]+@[\\w.-]+\\.(cl|com)$")
     val passwordRegex = Regex("^(?=.*[A-Za-z])(?=.*\\d).{6,}$")
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(24.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        Text(
+            text = "Registro de usuario",
+        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+        )
         OutlinedTextField(
             value = nombre,
             onValueChange = {nombre = it; nombreError= ""},
@@ -86,8 +99,8 @@ fun ResistroScreen() {
             onValueChange = {
                 contrasena = it
                 contrasenaError = when{
-                    contrasena.isEmpty()-> "Debe ingresar una contraseña"
-                    contrasena.length <8 -> "Debe tener a lo menos 8 carácteres"
+                    it.isEmpty()-> "Debe ingresar una contraseña"
+                    it.length <8 -> "Debe tener a lo menos 8 carácteres"
                     !passwordRegex.matches(contrasena) -> "Debe contener letras y números"
                     else -> ""
                 }
@@ -115,5 +128,30 @@ fun ResistroScreen() {
         if (confirmarcontrasenaError.isNotEmpty()){
             Text(confirmarcontrasenaError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
         }
+        Button(
+            onClick = {
+                if(correo.isNotEmpty() && contrasena.isNotEmpty() &&
+                    correoError.isEmpty() && contrasenaError.isEmpty()){
+
+                    val completado = homeViewModel.registrarUsuario(correo, contrasena, nombre, apellido)
+
+                    if (completado){
+                        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                        navController.navigate("home"){
+                            popUpTo ("registro"){inclusive = true  }
+                        }
+                    }else{
+                        Toast.makeText(context, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+                    }
+                }else{
+                    Toast.makeText(context, "asegurate que los campos sean correctos antes de continuar",
+                        Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Registrar")
+        }
     }
+
 }

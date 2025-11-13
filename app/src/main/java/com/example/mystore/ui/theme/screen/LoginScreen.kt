@@ -105,7 +105,7 @@ fun LoginScreen(navController: NavController){
                         Text("Iniciar sesión")
                     }
                     TextButton(
-                        onClick = {navController.navigate("Registro")}
+                        onClick = {navController.navigate("registro")}
                     ) {
                         Text("¿No tienes cuenta? Regístrate")
                     }

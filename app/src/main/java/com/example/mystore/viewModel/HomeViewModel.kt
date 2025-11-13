@@ -1,9 +1,8 @@
 package com.example.mystore.viewModel
 
-import androidx.compose.runtime.State
+import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mystore.model.CarItem
 import com.example.mystore.model.Producto
 import com.example.mystore.repository.ProductoRepository
@@ -15,13 +14,18 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.example.mystore.model.Descuento
+import com.example.mystore.model.Usuario
 import com.example.mystore.repository.DescuentoRepository
-
+import com.example.mystore.repository.UsuarioRepository
 
 class HomeViewModel(private val repository: ProductoRepository = ProductoRepository(),
-                    private val descuentoRepository: DescuentoRepository = DescuentoRepository()) : ViewModel() {
+                    private val descuentoRepository: DescuentoRepository = DescuentoRepository(),
+                    private val usuarioRepository: UsuarioRepository = UsuarioRepository()
+) : ViewModel() {
 
 
+    private val _usuarios= MutableStateFlow<List<Usuario>>(emptyList())
+    val usuarios: StateFlow<List<Usuario>> = _usuarios.asStateFlow()
     private val _productos = MutableStateFlow<List<Producto>>(emptyList())
     val producto: StateFlow<List<Producto>> = _productos.asStateFlow()
     private val _descuentos = MutableStateFlow<List<Descuento>>(emptyList())
@@ -41,6 +45,19 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
     init {
         fetchProducto()
         fetchDescuento()
+        fetchUsuario()
+    }
+    private fun fetchUsuario(){
+        viewModelScope.launch {
+            _isLoading.value= true
+            try {
+                _usuarios.value = usuarioRepository.obtenerUsuarios()
+            }catch (e: Exception){
+                print("Error al ingresar al usuario: ${e.localizedMessage}")
+            }finally {
+                _isLoading.value = false
+            }
+        }
     }
 
     private fun fetchDescuento(){
@@ -85,5 +102,17 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
         val currentItems = _carItem.value.toMutableList()
         val updateItems = currentItems.filterNot {it.producto.id == producto.id}
         _carItem.value = updateItems
+    }
+    fun registrarUsuario(nombre: String, apellido: String, correo: String, contrasena:String): Boolean {
+        val nuevoUsuario = Usuario(nombre, apellido, correo, contrasena, contrasena)
+        val completado = usuarioRepository.registrarUsuario(nuevoUsuario)
+        if (completado){
+            _usuarios.value = _usuarios.value + nuevoUsuario
+        }
+        return completado
+    }
+    fun validarLogin(correo: String, contrasena: String): Boolean{
+        val usuario = usuarioRepository.validarLogin(correo, contrasena)
+        return usuario != null
     }
 }

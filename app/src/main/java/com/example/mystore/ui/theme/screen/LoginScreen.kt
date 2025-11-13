@@ -1,5 +1,5 @@
 package com.example.mystore.ui.theme.screen
-import android.widget.Toast
+
 import com.example.mystore.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -12,19 +12,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -38,6 +34,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mystore.viewModel.HomeViewModel
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,6 +48,7 @@ fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel = view
 
 
     val context = LocalContext.current
+    var isLoading by remember { mutableStateOf(false) }
 
             Box(
                 modifier = Modifier
@@ -72,7 +70,7 @@ fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel = view
                             .clip(CircleShape)
                             .border(
                                 width = 2.dp,
-                                color= MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.primary,
                                 shape = CircleShape
                             )
                     )
@@ -102,33 +100,31 @@ fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel = view
                         onClick= {
                             val loginExitoso = homeViewModel.validarLogin(email, password)
                             if (loginExitoso){
-                                Toast.makeText(context, "Iniciando sesion", Toast.LENGTH_SHORT).show()
-                                navController.navigate("home")
+                                isLoading = true
                             }
                         },
                         modifier= Modifier.fillMaxWidth()
                     ){
 
                         Text("Iniciar sesión")
-
+                    }
+                    if (isLoading){
+                        LaunchedEffect(Unit) {
+                            delay(3000L)
+                            navController.navigate("home") {
+                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                            }
+                        }
                     }
                     TextButton(
                         onClick = {navController.navigate("registro")}
                     ) {
                         Text("¿No tienes cuenta? Regístrate")
                     }
+
                 }
             }
 
 
 }
 
-@Composable
-fun DrawerItem(title: String, onClick:() -> Unit){
-    NavigationDrawerItem(
-        label ={Text(title)},
-        selected = false,
-        onClick = onClick,
-        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-    )
-}

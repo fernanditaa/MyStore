@@ -1,5 +1,6 @@
 package com.example.mystore.ui.theme.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -31,6 +33,7 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(), navController: NavControl
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -158,6 +161,8 @@ fun DrawerItem(
 
 @Composable
 fun ProductCard(producto: Producto, onAddToCart: (Producto) -> Unit) {
+
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -201,7 +206,9 @@ fun ProductCard(producto: Producto, onAddToCart: (Producto) -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
 
                 IconButton (
-                    onClick = {onAddToCart(producto)},
+                    onClick = {onAddToCart(producto)
+                    Toast.makeText(context, "${producto.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
+                    },
                 ){
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,

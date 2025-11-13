@@ -1,6 +1,7 @@
 package com.example.mystore.ui.theme.screen
 
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,10 +18,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun CartScreen(navController: NavController, viewModel: HomeViewModel = viewModel(),
 ) {
+
     val cartItems by viewModel.carItem.collectAsState()
 
     val total = remember (cartItems){
@@ -75,18 +78,28 @@ fun CartTopBar(navController: NavController) {
 
 @Composable
 fun CartBottomBar(total: Double, onCheckout: () -> Unit) {
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text("Total a Pagar:", style = MaterialTheme.typography.titleMedium)
-            Text("$${"%.2f".format(total)}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
+            Text("$${"%.2f".format(total)}",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary)
         }
         Spacer(Modifier.height(8.dp))
 
         Button(
-            onClick = onCheckout,
+            onClick = {
+                if (total > 0.0){
+                    onCheckout()
+                }else{
+                    Toast.makeText(context, "No hay ariculos en el carrito", Toast.LENGTH_SHORT).show()
+                }
+            },
+            enabled = total > 0.0,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Finalizar Compra") // Esto nos llevará al Punto 4: Formulario de Checkout/Pago

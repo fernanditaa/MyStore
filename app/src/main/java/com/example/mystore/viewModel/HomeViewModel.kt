@@ -1,6 +1,5 @@
 package com.example.mystore.viewModel
 
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mystore.model.CarItem
@@ -103,6 +102,9 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
         val currentItems = _carItem.value.toMutableList()
         val updateItems = currentItems.filterNot {it.producto.id == producto.id}
         _carItem.value = updateItems
+    }
+    fun limpiarCarrito(){
+        _carItem.value = emptyList()
     }
     fun registrarUsuario(nombre: String, apellido: String, correo: String, contrasena:String): Boolean {
         val nuevoUsuario = Usuario(nombre, apellido, correo, contrasena, contrasena)

@@ -106,6 +106,7 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
                 }
             },
             label = {Text("Contraseña")},
+            visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
         if (contrasenaError.isNotEmpty()){

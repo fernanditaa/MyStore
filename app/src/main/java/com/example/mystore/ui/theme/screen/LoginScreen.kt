@@ -35,7 +35,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mystore.viewModel.HomeViewModel
 import kotlinx.coroutines.delay
-
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,7 +93,8 @@ fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel = view
                         value = password,
                         onValueChange = { password = it},
                         label = {Text("Contraseña")},
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        visualTransformation = PasswordVisualTransformation()
                     )
 
                     Button(

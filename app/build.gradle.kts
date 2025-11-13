@@ -51,6 +51,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
+    implementation ("androidx.compose.ui:ui:1.5.0")
     implementation("androidx.compose.ui:ui-graphics")
 
     implementation("androidx.compose.ui:ui-tooling-preview")

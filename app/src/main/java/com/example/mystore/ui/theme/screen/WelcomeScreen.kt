@@ -36,7 +36,7 @@ fun WelcomeScreen(navController: NavController){
             contentDescription = "Fondo de la tienda",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            alpha = 0.9f //hacemos la imagen mas transparente
+            alpha = 0.7f //hacemos la imagen mas transparente
         )
     }
     Column (

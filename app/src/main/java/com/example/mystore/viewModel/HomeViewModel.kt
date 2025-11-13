@@ -46,6 +46,7 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
         fetchProducto()
         fetchDescuento()
         fetchUsuario()
+        registrarUsuario("Kat", "Hub", "kathub@kathub.cl", "kathub1234")
     }
     private fun fetchUsuario(){
         viewModelScope.launch {

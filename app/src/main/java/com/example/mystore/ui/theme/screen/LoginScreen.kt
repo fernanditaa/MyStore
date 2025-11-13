@@ -1,4 +1,5 @@
 package com.example.mystore.ui.theme.screen
+import android.widget.Toast
 import com.example.mystore.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -34,21 +35,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mystore.viewModel.HomeViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController){
+fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel = viewModel()){
 
-    //para menu lateral desplegable
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
     var email by remember { mutableStateOf("") }
     var emailError by remember {mutableStateOf("")  }
     var password by remember { mutableStateOf("") }
 
 
+    val context = LocalContext.current
 
             Box(
                 modifier = Modifier
@@ -98,11 +100,17 @@ fun LoginScreen(navController: NavController){
 
                     Button(
                         onClick= {
-                            navController.navigate("Home")
+                            val loginExitoso = homeViewModel.validarLogin(email, password)
+                            if (loginExitoso){
+                                Toast.makeText(context, "Iniciando sesion", Toast.LENGTH_SHORT).show()
+                                navController.navigate("home")
+                            }
                         },
                         modifier= Modifier.fillMaxWidth()
                     ){
+
                         Text("Iniciar sesión")
+
                     }
                     TextButton(
                         onClick = {navController.navigate("registro")}

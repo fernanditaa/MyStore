@@ -3,6 +3,7 @@ package com.example.mystore.viewModel
 import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mystore.model.CarItem
 import com.example.mystore.model.Producto
 import com.example.mystore.repository.ProductoRepository
@@ -13,12 +14,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.example.mystore.model.Descuento
+import com.example.mystore.repository.DescuentoRepository
 
-class HomeViewModel(private val repository: ProductoRepository = ProductoRepository()) : ViewModel() {
+
+class HomeViewModel(private val repository: ProductoRepository = ProductoRepository(),
+                    private val descuentoRepository: DescuentoRepository = DescuentoRepository()) : ViewModel() {
+
 
     private val _productos = MutableStateFlow<List<Producto>>(emptyList())
     val producto: StateFlow<List<Producto>> = _productos.asStateFlow()
-
+    private val _descuentos = MutableStateFlow<List<Descuento>>(emptyList())
+    val descuento: StateFlow<List<Descuento>> = _descuentos.asStateFlow()
     private val _carItem = MutableStateFlow<List<CarItem>>(emptyList())
     val carItem: StateFlow<List<CarItem>> = _carItem
     val carItemCount: StateFlow<Int> = _carItem.map { it.sumOf { item -> item.quantity } }.stateIn(
@@ -26,13 +33,28 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
         started = SharingStarted.WhileSubscribed(1000),
         initialValue = 0
     )
+
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
         fetchProducto()
+        fetchDescuento()
     }
 
+    private fun fetchDescuento(){
+        viewModelScope.launch {
+            _isLoading.value= true
+            try {
+                _descuentos.value = descuentoRepository.getDescuento()
+            }catch (e: Exception){
+                print("Error al cargar el descuento: ${e.localizedMessage}")
+            }finally {
+                _isLoading.value = false
+            }
+        }
+    }
     private fun fetchProducto(){
         viewModelScope.launch {
             _isLoading.value = true

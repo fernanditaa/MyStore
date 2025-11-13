@@ -1,118 +1,214 @@
 package com.example.mystore.ui.theme.screen
 
-import android.service.quickaccesswallet.WalletCard
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mystore.model.Producto
-import com.example.mystore.viewModel.HomeViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.mystore.model.Producto
+import com.example.mystore.viewModel.HomeViewModel
+import kotlinx.coroutines.launch
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(viewModel: HomeViewModel = viewModel(), navController: NavController){
+fun HomeScreen(viewModel: HomeViewModel = viewModel(), navController: NavController) {
 
     val producto by viewModel.producto.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val cartCount by viewModel.carItemCount.collectAsState()
 
-    Scaffold(
-        topBar = { TopBar(cartCount = cartCount, navController = navController)}
-    ){ paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues).fillMaxSize()){
-            if (isLoading){
-                CircularProgressIndicator(Modifier.align(Alignment.Center))
-            }else{
-                LazyColumn(contentPadding = PaddingValues(16.dp)){
-                    items(producto){ producto->
-                        ProductCard(producto = producto, onAddToCart = {viewModel.agregarCarrito(producto) })
-                        Spacer(Modifier.height(8.dp))
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    text = "Menú KatHub",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(16.dp)
+                )
+                Divider()
+
+                DrawerItem(
+                    title = "Inicio",
+                    icon = Icons.Default.Home,
+                    onClick = { scope.launch { drawerState.close()}
+                    navController.navigate("Home"){
+                        popUpTo (navController.graph.startDestinationId){inclusive = true}
+                    }
+                    }
+                )
+                DrawerItem(
+                    title = "Mi Perfil",
+                    icon = Icons.Default.Person,
+                    onClick = { scope.launch { drawerState.close() } 
+                    navController.navigate("Mi Perfil"){
+                        popUpTo (navController.graph.startDestinationId){inclusive = true}
+                    }
+                    }
+                )
+                DrawerItem(
+                    title = "Descuentos",
+                    icon = Icons.Filled.Discount,
+                    onClick = { scope.launch { drawerState.close() }
+                    navController.navigate("Descuentos"){
+                        popUpTo (navController.graph.startDestinationId){inclusive = true}
+                    }
+                    }
+
+                )
+                DrawerItem(
+                    title = "Contacto",
+                    icon = Icons.Default.Contacts,
+                    onClick = { scope.launch { drawerState.close()} /* navegar a profile */ }
+                )
+
+                DrawerItem(
+                    title = "Cerrar Sesión",
+                    icon = Icons.AutoMirrored.Filled.ExitToApp,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        navController.navigate("login") {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        }
+                    }
+                )
+
+
+            }
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("KatHub") },
+                    navigationIcon = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(Icons.Default.Menu, contentDescription = "Abrir Menú")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { navController.navigate("carrito") }) {
+                            BadgedBox(
+                                badge = {
+                                    if (cartCount > 0) {
+                                        Badge { Text(cartCount.toString()) }
+                                    }
+                                }
+                            ) {
+                                Icon(Icons.Filled.ShoppingCart, contentDescription = "Carrito")
+                            }
+                        }
+                    }
+                )
+            }
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                } else {
+                    LazyColumn(contentPadding = PaddingValues(16.dp)) {
+                        items(producto) { p ->
+                            ProductCard(
+                                producto = p,
+                                onAddToCart = { viewModel.agregarCarrito(p) }
+                            )
+                            Spacer(Modifier.height(8.dp))
+                        }
                     }
                 }
             }
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
+// crea el item del menú lateral (la hambuerguesa)
 @Composable
-fun TopBar(cartCount: Int, navController: NavController){
-    TopAppBar(
-        title = {Text("KatHub")},
-        navigationIcon = {
-            IconButton(onClick = {navController.navigate("Login")}) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                    contentDescription = "Cerrar sesión"
-                )
-            }
-        },
-        actions = {
-            IconButton(onClick = {navController.navigate("Carrito")}) {
-                BadgedBox(
-                    badge = {
-                        if (cartCount > 0){
-                            Badge { Text(cartCount.toString()) }
-                        }
-                    }
-                ) {
-                    Icon(Icons.Filled.ShoppingCart,contentDescription = "Carrito")
-                }
-            }
-        }
+fun DrawerItem(
+    title: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    onClick: () -> Unit
+) {
+    NavigationDrawerItem(
+        label = { Text(title) },
+        selected = false,
+        onClick = onClick,
+        icon = { Icon(icon, contentDescription = title) },
+        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
     )
 }
+
 @Composable
-fun ProductCard(producto: Producto, onAddToCart: (Producto)-> Unit){
-    Card (
-        modifier = Modifier.fillMaxWidth(),
+fun ProductCard(producto: Producto, onAddToCart: (Producto) -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ){
-        Column(modifier = Modifier.padding(16.dp)
-        ){
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+
+            var expanded by remember { mutableStateOf(false) }
             Image(
                 painter = painterResource(id = producto.imagen),
                 contentDescription = producto.nombre,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .padding(bottom = 8.dp),
+                    .size(if (expanded) 500.dp else 150.dp)
+                    .clickable { expanded = !expanded },
                 contentScale = ContentScale.Crop
             )
-            Text(producto.nombre,
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = producto.nombre,
                 style = MaterialTheme.typography.titleLarge)
 
-            Spacer(Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Text("${producto.precio}",
-                style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            Text(
+                text = producto.descripcion,
+                style = MaterialTheme.typography.titleMedium)
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            Text(producto.descripcion,
+            Text(
+                text = producto.medida,
                 style = MaterialTheme.typography.bodyMedium)
 
-            Button(
-                onClick = {onAddToCart(producto)},
-                modifier = Modifier.align(Alignment.Start)
-            ) {
-                Text("Añadir al carrito")
-            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "$${producto.precio}",
+                style = MaterialTheme.typography.bodyMedium)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+                IconButton (
+                    onClick = {onAddToCart(producto)},
+                ){
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Añadir al carrito"
+
+                    )
+                }
         }
     }
 }
-

@@ -57,42 +57,12 @@ fun LoginScreen(navController: NavController){
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Text(
-                    text = "Menú",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
-                Divider()
 
-                DrawerItem("Nosotros"){ /* pantalla nosotros */ }
-                DrawerItem("Contacto"){ /* pantalla contacto */ }
-                DrawerItem("Ubicación"){ /* pantalla ubicacion */ }
-            }
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {Text("Inicio de sesión")},
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            scope.launch { drawerState.open() }
-                        }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menú")
-                        }
-                    }
-                )
-            }
-        ){
-            paddingValues ->
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(0.dp),
                 contentAlignment = Alignment.Center
             ){
                 Column(
@@ -116,6 +86,10 @@ fun LoginScreen(navController: NavController){
                     Text(
                         "Bienvenido a KatHub",
                         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+                    )
+                    Text(
+                        "Inicio de sesión",
+                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
                     )
                     OutlinedTextField(
                         value = email,
@@ -145,8 +119,8 @@ fun LoginScreen(navController: NavController){
                     }
                 }
             }
-        }
-    }
+
+
 }
 
 @Composable

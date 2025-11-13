@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.mystore.viewModel.HomeViewModel
-import com.example.mystore.model.Producto
 import com.example.mystore.model.CarItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,9 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun CartScreen(
-    navController: NavController,
-    viewModel: HomeViewModel = viewModel()
+fun CartScreen(navController: NavController, viewModel: HomeViewModel = viewModel(),
 ) {
     val cartItems by viewModel.carItem.collectAsState()
 
@@ -32,7 +29,7 @@ fun CartScreen(
 
     Scaffold(
         topBar = { CartTopBar(navController = navController) },
-        bottomBar = { CartBottomBar(total = total, onCheckout = { /* Lógica de checkout */ }) }
+        bottomBar = { CartBottomBar(total = total, onCheckout = { navController.navigate("finalizar compra") }) }
     ) { paddingValues ->
 
         if (cartItems.isEmpty()) {
@@ -87,11 +84,13 @@ fun CartBottomBar(total: Double, onCheckout: () -> Unit) {
             Text("$${"%.2f".format(total)}", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary)
         }
         Spacer(Modifier.height(8.dp))
+
         Button(
             onClick = onCheckout,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Finalizar Compra") // Esto nos llevará al Punto 4: Formulario de Checkout/Pago
+
         }
     }
 }

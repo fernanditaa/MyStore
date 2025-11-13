@@ -174,7 +174,8 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
             }
             OutlinedTextField(
                 value =numero,
-                onValueChange = {numero = it; nombreError = if (it.isBlank()) "Ingresa el numero de la casa" else ""},
+                onValueChange = {numero = it; numeroError = if (it.isBlank()) "Ingresa el número de la casa" else ""
+                                },
                 isError = numeroError.isNotEmpty(),
                 label = {Text(text = "Número")},
                 modifier = Modifier.fillMaxWidth()

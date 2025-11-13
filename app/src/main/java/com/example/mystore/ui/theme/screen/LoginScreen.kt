@@ -32,23 +32,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mystore.viewModel.HomeViewModel
 import kotlinx.coroutines.delay
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel = viewModel()){
+fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel){
 
 
     var email by remember { mutableStateOf("") }
     var emailError by remember {mutableStateOf("")  }
     var password by remember { mutableStateOf("") }
-
+    var loginError by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(false) }
+
 
             Box(
                 modifier = Modifier
@@ -102,12 +102,21 @@ fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel = view
                             val loginExitoso = homeViewModel.validarLogin(email, password)
                             if (loginExitoso){
                                 isLoading = true
+                            }else{
+                                loginError = "Correo o contraseña incorrectos"
                             }
                         },
                         modifier= Modifier.fillMaxWidth()
                     ){
 
                         Text("Iniciar sesión")
+                    }
+                    if(loginError.isNotEmpty()){
+                        Text(
+                            text = loginError,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
                     }
                     if (isLoading){
                         LaunchedEffect(Unit) {

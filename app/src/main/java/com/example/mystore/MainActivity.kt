@@ -55,10 +55,10 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("login"){
-                            LoginScreen(navController = navController)
+                            LoginScreen(navController = navController, homeViewModel = sharedHomeViewModel)
                         }
                         composable("registro"){
-                            RegistroUsuarioScreen(navController = navController)
+                            RegistroUsuarioScreen(navController = navController, homeViewModel = sharedHomeViewModel)
                         }
 
                         composable("home"){
@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                             CartScreen(navController = navController, sharedHomeViewModel)
                         }
                         composable("Mi Perfil"){
-                            PerfilScreen(navController = navController)
+                            PerfilScreen(navController = navController, )
                         }
                         composable("finalizar compra"){
                             CompraScreen(navController = navController, viewModel = sharedHomeViewModel)

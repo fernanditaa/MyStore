@@ -1,6 +1,5 @@
 package com.example.mystore.ui.theme.screen
 
-import android.R
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,13 +21,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.mystore.viewModel.HomeViewModel
 
 
 @Composable
-fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewModel = viewModel()) {
+fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewModel) {
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
@@ -131,10 +129,19 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
         }
         Button(
             onClick = {
-                if(correo.isNotEmpty() && contrasena.isNotEmpty() &&
-                    correoError.isEmpty() && contrasenaError.isEmpty()){
+                if(nombre.isNotEmpty()&&
+                    apellido.isNotEmpty()&&
+                    correo.isNotEmpty()&&
+                    contrasena.isNotEmpty()&&
+                    confirmarcontrasena.isNotEmpty()&&
+                    nombreError.isEmpty()&&
+                    apellidoError.isEmpty()&&
+                    correoError.isEmpty() &&
+                    contrasenaError.isEmpty()&&
+                    confirmarcontrasenaError.isEmpty())
+                {
 
-                    val completado = homeViewModel.registrarUsuario(correo, contrasena, nombre, apellido)
+                    val completado = homeViewModel.registrarUsuario(nombre, apellido, correo, contrasena)
 
                     if (completado){
                         Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
@@ -145,7 +152,7 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
                         Toast.makeText(context, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show()
                     }
                 }else{
-                    Toast.makeText(context, "asegurate que los campos sean correctos antes de continuar",
+                    Toast.makeText(context, "Asegurate que los campos sean correctos antes de continuar",
                         Toast.LENGTH_SHORT).show()
                 }
             },

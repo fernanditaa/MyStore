@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.mystore.viewModel.HomeViewModel
 import com.example.mystore.model.CarItem
@@ -21,8 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 @Composable
-fun CartScreen(navController: NavController, viewModel: HomeViewModel = viewModel(),
-) {
+fun CartScreen(navController: NavController, viewModel: HomeViewModel, ) {
 
     val cartItems by viewModel.carItem.collectAsState()
 

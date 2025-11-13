@@ -51,27 +51,27 @@ fun HomeScreen(viewModel: HomeViewModel = viewModel(), navController: NavControl
                     title = "Inicio",
                     icon = Icons.Default.Home,
                     onClick = { scope.launch { drawerState.close()}
-                    navController.navigate("Home"){
-                        popUpTo (navController.graph.startDestinationId){inclusive = true}
-                    }
+                        navController.navigate("Home"){
+                            popUpTo (navController.graph.startDestinationId){inclusive = true}
+                        }
                     }
                 )
                 DrawerItem(
                     title = "Mi Perfil",
                     icon = Icons.Default.Person,
-                    onClick = { scope.launch { drawerState.close() } 
-                    navController.navigate("Mi Perfil"){
-                        popUpTo (navController.graph.startDestinationId){inclusive = true}
-                    }
+                    onClick = { scope.launch { drawerState.close() }
+                        navController.navigate("Mi Perfil"){
+                            popUpTo (navController.graph.startDestinationId){inclusive = true}
+                        }
                     }
                 )
                 DrawerItem(
                     title = "Descuentos",
                     icon = Icons.Filled.Discount,
                     onClick = { scope.launch { drawerState.close() }
-                    navController.navigate("Descuentos"){
-                        popUpTo (navController.graph.startDestinationId){inclusive = true}
-                    }
+                        navController.navigate("Descuentos"){
+                            popUpTo (navController.graph.startDestinationId){inclusive = true}
+                        }
                     }
 
                 )
@@ -205,17 +205,17 @@ fun ProductCard(producto: Producto, onAddToCart: (Producto) -> Unit) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-                IconButton (
-                    onClick = {onAddToCart(producto)
+            IconButton (
+                onClick = {onAddToCart(producto)
                     Toast.makeText(context, "${producto.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
-                    },
-                ){
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = "Añadir al carrito"
+                },
+            ){
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = "Añadir al carrito"
 
-                    )
-                }
+                )
+            }
         }
     }
 }

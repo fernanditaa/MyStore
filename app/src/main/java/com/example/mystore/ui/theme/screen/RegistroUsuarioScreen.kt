@@ -1,12 +1,14 @@
 package com.example.mystore.ui.theme.screen
 
 import android.widget.Toast
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -45,6 +47,17 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
     val passwordRegex = Regex("^(?=.*[A-Za-z])(?=.*\\d).{6,}$")
     val context = LocalContext.current
 
+    val pasosCompletados = listOf(
+        nombre.isNotBlank(),
+        apellido.isNotBlank(),
+        correo.isNotEmpty() && emailRegex.matches(correo),
+        contrasena.isNotEmpty() && contrasena.length >= 8 && passwordRegex.matches(contrasena),
+        confirmarcontrasena.isNotEmpty() && confirmarcontrasena == contrasena
+    ).count { it }
+
+    val targetProgress = pasosCompletados / 5f
+    val animatedProgress by animateFloatAsState(targetValue = targetProgress, label = "registroProgress")
+
     Column(
         modifier = Modifier
             .padding(24.dp)
@@ -55,6 +68,13 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
             text = "Registro de usuario",
         style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
         )
+
+        LinearProgressIndicator(
+            progress = { animatedProgress },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+
         OutlinedTextField(
             value = nombre,
             onValueChange = {nombre = it; nombreError= ""},
@@ -156,6 +176,7 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
                         Toast.LENGTH_SHORT).show()
                 }
             },
+            enabled = animatedProgress >= 1f,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Registrar")

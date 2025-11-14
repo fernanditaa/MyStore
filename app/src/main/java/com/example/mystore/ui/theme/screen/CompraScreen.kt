@@ -1,6 +1,7 @@
 package com.example.mystore.ui.theme.screen
 
 import android.widget.Toast
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -86,6 +88,23 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
     val scaffoldState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
+    val pasosCompletados = listOf(
+        nombre.isNotBlank(),
+        correo.isNotEmpty() && emailRegex.matches(correo),
+        telefono.isNotEmpty(),
+        calle.isNotEmpty(),
+        numero.isNotEmpty(),
+        ciudad.isNotEmpty(),
+        comuna.isNotEmpty(),
+        numerotarjeta.isNotEmpty(),
+        fechaVencimiento.isNotEmpty(),
+        cvv.isNotEmpty()
+
+    ).count { it }
+
+    val targetProgress = pasosCompletados / 10f
+    val animatedProgress by animateFloatAsState(targetValue = targetProgress, label = "registroProgress")
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -120,8 +139,12 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
         )
             Spacer(modifier = Modifier.height(24.dp))
 
+            LinearProgressIndicator(
+                progress = { animatedProgress },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        OutlinedTextField(
+            OutlinedTextField(
             value = nombre,
             onValueChange = {nombre = it; nombreError = if (it.isBlank()) "Ingrese su nombre" else ""},
             isError = nombreError.isNotEmpty(),
@@ -297,6 +320,7 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
                         }
                     }
                 },
+                enabled = animatedProgress >= 1f,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Pagar")

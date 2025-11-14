@@ -1,4 +1,6 @@
 package com.example.mystore.ui.theme.screen
+
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,8 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.navigation.NavController
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,12 +32,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.mystore.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerfilScreen( navController: NavController) {
     var selectedImage by remember { mutableStateOf(R.drawable.imagen2) }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var isEditing by remember { mutableStateOf(false) }
 
     //creamos los datos para el usuario
@@ -54,6 +56,9 @@ fun PerfilScreen( navController: NavController) {
         R.drawable.imagen6,
         R.drawable.imagen7,
     )
+    Spacer(modifier = Modifier.height(32.dp))
+
+
     Scaffold(
         topBar ={
             TopAppBar(
@@ -166,7 +171,6 @@ fun PerfilScreen( navController: NavController) {
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(32.dp))
 
             Button(onClick = {navController.popBackStack()}) {
                 Text("Volver")

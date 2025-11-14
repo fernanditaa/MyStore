@@ -55,27 +55,33 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable("login"){
-                            LoginScreen(navController = navController, homeViewModel = sharedHomeViewModel)
+                            LoginScreen(navController = navController,
+                                homeViewModel = sharedHomeViewModel)
                         }
                         composable("registro"){
-                            RegistroUsuarioScreen(navController = navController, homeViewModel = sharedHomeViewModel)
+                            RegistroUsuarioScreen(navController = navController,
+                                homeViewModel = sharedHomeViewModel)
                         }
 
                         composable("home"){
-                            HomeScreen(viewModel = sharedHomeViewModel, navController = navController)
+                            HomeScreen(viewModel = sharedHomeViewModel,
+                                navController = navController)
                         }
 
                         composable("carrito") {
-                            CartScreen(navController = navController, sharedHomeViewModel)
+                            CartScreen(navController = navController,
+                                viewModel = sharedHomeViewModel)
                         }
                         composable("Mi Perfil"){
                             PerfilScreen(navController = navController, )
                         }
                         composable("finalizar compra"){
-                            CompraScreen(navController = navController, viewModel = sharedHomeViewModel)
+                            CompraScreen(navController = navController,
+                                viewModel = sharedHomeViewModel)
                         }
                         composable ("descuentos"){
-                            DescuentosScreen(navController = navController, viewModel = sharedHomeViewModel)
+                            DescuentosScreen(navController = navController,
+                                viewModel = sharedHomeViewModel)
                         }
                     }
                 }

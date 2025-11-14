@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    kotlin("kapt")
 }
 
 android {
@@ -51,12 +53,19 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
-    implementation ("androidx.compose.ui:ui:1.5.0")
     implementation("androidx.compose.ui:ui-graphics")
 
+    // Room (base de datos)
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+
+
     implementation("androidx.compose.ui:ui-tooling-preview")
-// Coil para Jetpack Compose
+
+    // Coil para Jetpack Compose
     implementation("io.coil-kt:coil-compose:2.2.2")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -73,9 +82,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
 
-    //agregamos para usar Junit5
-    tasks.withType<Test>().configureEach {
-        useJUnitPlatform()
-    }
+//agregamos para usar Junit5
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }

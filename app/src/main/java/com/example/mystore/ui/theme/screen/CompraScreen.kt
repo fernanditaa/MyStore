@@ -256,7 +256,7 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
                 value = fechaVencimiento,
                 onValueChange = {fechaVencimiento = it; fechaVencimientoError = when{
                     it.isBlank()-> "Ingrese Fecha"
-                    !expiryRegex.matches(it) -> "fecha invalida" else -> ""
+                    !expiryRegex.matches(it) -> "Fecha invalida" else -> ""
                 }},
                 isError = fechaVencimientoError.isNotEmpty(),
                 label = {Text(text = "MM/AA")},
@@ -270,7 +270,7 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
                 value = cvv,
                 onValueChange = {cvv = it; cvvError = when{
                     it.isBlank()-> "El cvv es incorrecto"
-                    !cvvRegex.matches(it)->"cvv invalido" else -> ""
+                    !cvvRegex.matches(it)->"CVV invalido" else -> ""
                 }},
                 isError = cvvError.isNotEmpty(),
                 label = {Text(text = "cvv")},

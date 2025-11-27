@@ -1,27 +1,24 @@
 package com.example.mystore.repository
 
+import com.example.mystore.data.dao.UsuarioDao
 import com.example.mystore.model.Usuario
+import kotlinx.coroutines.flow.Flow
 
-class UsuarioRepository {
+class UsuarioRepository (private val usuarioDao: UsuarioDao){
 
-    // Lista en memoria donde se guardan los usuarios registrados
-    private val usuarios = mutableListOf<Usuario>()
-
-    // Registrar usuario
-    fun registrarUsuario(usuario: Usuario): Boolean {
-        // Si ya existe un usuario con el mismo correo, no lo agrega
-        if (usuarios.any { it.correo == usuario.correo }) {
+    suspend fun registrarUsuario(usuario: Usuario): Boolean{
+        val existente = usuarioDao.obtenerPorCorreo(usuario.correo)
+        if(existente !=null){
             return false
         }
-        usuarios.add(usuario)
+        usuarioDao.insertarUsuario(usuario)
         return true
     }
-
-    // Validar login
-    fun validarLogin(correo: String, contrasena: String): Usuario? {
-        return usuarios.find { it.correo == correo && it.contrasena == contrasena }
+    suspend fun validarLogin(correo: String, contrasena: String): Usuario?{
+        return usuarioDao.login(correo, contrasena)
     }
-
-    // Obtener lista de usuarios (por si la necesitas)
-    fun obtenerUsuarios(): List<Usuario> = usuarios
+    suspend fun actualizarUsuario(usuario: Usuario){
+        usuarioDao.actualizarUsuario(usuario)
+    }
+    fun obtenerUsuarios(): Flow<List<Usuario>> = usuarioDao.obtenerUsuarios()
 }

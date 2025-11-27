@@ -158,23 +158,35 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
                     apellidoError.isEmpty()&&
                     correoError.isEmpty() &&
                     contrasenaError.isEmpty()&&
-                    confirmarcontrasenaError.isEmpty())
-                {
+                    confirmarcontrasenaError.isEmpty()
+                    ){
 
-                    val completado = homeViewModel.registrarUsuario(nombre, apellido, correo, contrasena)
-
+                    homeViewModel.registrarUsuario(
+                        nombre = nombre,
+                        apellido = apellido,
+                        correo = correo,
+                        contrasena = contrasena
+                    ){completado ->
                     if (completado){
-                        Toast.makeText(context, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Registro exitoso",
+                            Toast.LENGTH_SHORT).show()
                         navController.navigate("home"){
                             popUpTo ("registro"){inclusive = true  }
                         }
                     }else{
-                        Toast.makeText(context, "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            "Correo o contraseña incorrectos",
+                            Toast.LENGTH_SHORT).show()
+                         }
                     }
                 }else{
                     Toast.makeText(context, "Asegurate que los campos sean correctos antes de continuar",
                         Toast.LENGTH_SHORT).show()
                 }
+
             },
             enabled = animatedProgress >= 1f,
             modifier = Modifier.fillMaxWidth()

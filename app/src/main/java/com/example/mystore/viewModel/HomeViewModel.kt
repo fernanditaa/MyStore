@@ -1,7 +1,14 @@
 package com.example.mystore.viewModel
 
+import android.app.Application
+import android.content.Context
+import android.graphics.Bitmap
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mystore.data.dao.AppDatabase
 import com.example.mystore.model.CarItem
 import com.example.mystore.model.Producto
 import com.example.mystore.repository.ProductoRepository
@@ -16,11 +23,14 @@ import com.example.mystore.model.Descuento
 import com.example.mystore.model.Usuario
 import com.example.mystore.repository.DescuentoRepository
 import com.example.mystore.repository.UsuarioRepository
+import com.example.mystore.ui.theme.screen.ProductCard
+import kotlinx.coroutines.flow.collectLatest
 
-class HomeViewModel(private val repository: ProductoRepository = ProductoRepository(),
-                    private val descuentoRepository: DescuentoRepository = DescuentoRepository(),
-                    private val usuarioRepository: UsuarioRepository = UsuarioRepository()
-) : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val productoRepository: ProductoRepository = ProductoRepository()
+    private val descuentoRepository: DescuentoRepository = DescuentoRepository()
+    private val usuarioRepository: UsuarioRepository
 
 
     private val _usuarios= MutableStateFlow<List<Usuario>>(emptyList())
@@ -38,20 +48,36 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
     )
 
 
+    private val _usuarioActual = MutableStateFlow<Usuario?>(null)
+    val usuarioActual: StateFlow<Usuario?> = _usuarioActual.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
+        val db = AppDatabase.getDatabase(application)
+        val usuarioDao = db.usuarioDao()
+        usuarioRepository = UsuarioRepository(usuarioDao)
+
         fetchProducto()
         fetchDescuento()
         fetchUsuario()
-        registrarUsuario("Kat", "Hub", "kathub@kathub.cl", "kathub1234")
+
+        registrarUsuario(
+            nombre = "Kat",
+            apellido = "Hub",
+            correo = "kathub@kathub.cl",
+            contrasena = "kathub1234",
+        onResult ={/* ignoramos el resultado */}
+        )
     }
     private fun fetchUsuario(){
         viewModelScope.launch {
             _isLoading.value= true
             try {
-                _usuarios.value = usuarioRepository.obtenerUsuarios()
+                usuarioRepository.obtenerUsuarios().collectLatest { lista ->
+                    _usuarios.value = lista
+                }
             }catch (e: Exception){
                 print("Error al ingresar al usuario: ${e.localizedMessage}")
             }finally {
@@ -76,7 +102,7 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
         viewModelScope.launch {
             _isLoading.value = true
             try{
-                _productos.value = repository.getProducto()
+                _productos.value = productoRepository.getProducto()
             }catch (e: Exception){
                 println("Error al cargar el producto: ${e.localizedMessage}")
             }finally {
@@ -106,16 +132,88 @@ class HomeViewModel(private val repository: ProductoRepository = ProductoReposit
     fun limpiarCarrito(){
         _carItem.value = emptyList()
     }
-    fun registrarUsuario(nombre: String, apellido: String, correo: String, contrasena:String): Boolean {
-        val nuevoUsuario = Usuario(nombre, apellido, correo, contrasena, contrasena)
-        val completado = usuarioRepository.registrarUsuario(nuevoUsuario)
-        if (completado){
-            _usuarios.value = _usuarios.value + nuevoUsuario
+    fun registrarUsuario(nombre: String,
+                         apellido: String,
+                         correo: String,
+                         contrasena:String,
+                         onResult:( Boolean) -> Unit
+    ){
+        viewModelScope.launch {
+            val nuevoUsuario = Usuario(
+                nombre = nombre,
+                apellido = apellido,
+                correo = correo,
+                contrasena = contrasena
+            )
+            val completado = usuarioRepository.registrarUsuario(nuevoUsuario)
+            onResult(completado)
         }
-        return completado
     }
-    fun validarLogin(correo: String, contrasena: String): Boolean{
+    fun validarLogin(
+        correo: String,
+        contrasena: String,
+        onResult: (Boolean) -> Unit
+    ) {
+        viewModelScope.launch {
         val usuario = usuarioRepository.validarLogin(correo, contrasena)
-        return usuario != null
+            _usuarioActual.value = usuario
+        onResult (usuario != null)
+        }
+    }
+
+    fun actualizarPerfil(
+        nombre: String,
+        correo: String,
+        telefono: String,
+        direccion: String,
+        onResult: (Boolean) -> Unit
+    ){
+        viewModelScope.launch {
+            val actual = _usuarioActual.value
+            if (actual == null){
+                onResult(false)
+                return@launch
+            }
+            val actualiazdo = actual.copy(
+                nombre = nombre,
+                correo = correo,
+                telefono = telefono,
+                direccion= direccion,
+            )
+            try {
+                usuarioRepository.actualizarUsuario(actualiazdo)
+                _usuarioActual.value = actualiazdo
+                onResult(true)
+            }catch (e: Exception){
+                onResult(false)
+            }
+        }
+    }
+    fun actualizarFotoPerfil(
+        bitmap: Bitmap,
+        onResult: (Boolean) -> Unit
+    ){
+        viewModelScope.launch {
+            val actual = _usuarioActual.value
+            if (actual == null){
+                onResult(false)
+                return@launch
+            }
+            try {
+                val context = getApplication<Application>()
+                val fileName = "foto_perfil_${actual.id}.png"
+
+                context.openFileOutput(fileName, Context.MODE_PRIVATE).use { fos ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
+                }
+                val actualizado = actual.copy(fotoPerfilPath =  fileName)
+                usuarioRepository.actualizarUsuario(actualizado)
+                _usuarioActual.value = actualizado
+                onResult(true)
+            }catch (e: Exception){
+                e.printStackTrace()
+                onResult(false)
+            }
+        }
     }
 }

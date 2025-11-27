@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
                                 viewModel = sharedHomeViewModel)
                         }
                         composable("Mi Perfil"){
-                            PerfilScreen(navController = navController, )
+                            PerfilScreen(navController = navController, homeViewModel = sharedHomeViewModel)
                         }
                         composable("finalizar compra"){
                             CompraScreen(navController = navController,

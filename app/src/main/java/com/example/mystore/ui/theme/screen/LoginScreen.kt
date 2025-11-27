@@ -1,5 +1,6 @@
 package com.example.mystore.ui.theme.screen
 
+import android.widget.Toast
 import com.example.mystore.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -99,16 +100,28 @@ fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel){
 
                     Button(
                         onClick= {
-                            val loginExitoso = homeViewModel.validarLogin(email, password)
-                            if (loginExitoso){
-                                isLoading = true
+                            if (email.isBlank()|| password.isBlank()){
+                                Toast.makeText(context,"Ingresa tu correo y contraseña", Toast.LENGTH_SHORT).show()
                             }else{
-                                loginError = "Correo o contraseña incorrectos"
+                                homeViewModel.validarLogin(
+                                    correo = email,
+                                    contrasena = password
+                                ){
+                                    valido->
+                                    if (valido){
+                                        Toast.makeText(context, "Inisiando sesión...", Toast.LENGTH_SHORT).show()
+                                        navController.navigate("home"){
+                                            popUpTo ("login"){ inclusive = true }
+                                        }
+                                    }else{
+                                        loginError = "Correo o contraseña no coinciden"
+                                        Toast.makeText(context, "Correo o contraseña no coinciden",
+                                            Toast.LENGTH_SHORT).show()
+                                    }
+                                }
                             }
-                        },
-                        modifier= Modifier.fillMaxWidth()
+                        }
                     ){
-
                         Text("Iniciar sesión")
                     }
                     if(loginError.isNotEmpty()){

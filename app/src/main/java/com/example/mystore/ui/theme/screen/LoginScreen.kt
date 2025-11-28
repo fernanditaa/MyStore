@@ -39,7 +39,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel){
+fun LoginScreen(navController: NavController, homeViewModel: HomeViewModel){
 
 
     var email by remember { mutableStateOf("") }

@@ -52,6 +52,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 @Composable
 fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
 
+// hay que modificar para que los datos cambien con el usuario, quedaron unos datos fijos
+
+
     //para el usuario que inicia sesion
     val usuarioActual by homeViewModel.usuarioActual.collectAsState()
 

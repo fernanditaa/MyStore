@@ -57,6 +57,10 @@ import androidx.compose.material3.OutlinedButton
 
 @Composable
 fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewModel) {
+
+    //Modificar el boton de "Rgistrar" esta en la parte superior de nuevo XD
+    //tambien hay que arreglar la validacon para usar la camara :(
+
     //Formulario
     var nombre by remember { mutableStateOf("") }
     var apellido by remember { mutableStateOf("") }

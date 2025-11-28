@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UsuarioDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertarUsuario(usuario: Usuario)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertarUsuario(usuario: Usuario): Long
 
     @Query("SELECT * FROM usuarios")
     fun obtenerUsuarios(): Flow<List<Usuario>>

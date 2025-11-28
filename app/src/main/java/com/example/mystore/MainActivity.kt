@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                         contentDescription = "Fondo de la tienda",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        alpha = 0.3f //hacemos la imagen mas transparente
+                        alpha = 0.5f //hacemos la imagen mas transparente
                     )
                     NavHost(
                         navController = navController,

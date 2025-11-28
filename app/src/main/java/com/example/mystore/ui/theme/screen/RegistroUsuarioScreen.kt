@@ -253,7 +253,6 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
         if (confirmarcontrasenaError.isNotEmpty()){
             Text(confirmarcontrasenaError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
         }
-    }
         Button(
             onClick = {
                 if(nombre.isNotEmpty()&&
@@ -266,7 +265,7 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
                     correoError.isEmpty() &&
                     contrasenaError.isEmpty()&&
                     confirmarcontrasenaError.isEmpty()
-                    ){
+                ){
 
                     homeViewModel.registrarUsuario(
                         nombre = nombre,
@@ -275,20 +274,20 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
                         contrasena = contrasena,
                         foto = selectedUri
                     ){completado ->
-                    if (completado){
-                        Toast.makeText(
-                            context,
-                            "Registro exitoso",
-                            Toast.LENGTH_SHORT).show()
-                        navController.navigate("home"){
-                            popUpTo ("registro"){inclusive = true  }
+                        if (completado){
+                            Toast.makeText(
+                                context,
+                                "Registro exitoso",
+                                Toast.LENGTH_SHORT).show()
+                            navController.navigate("home"){
+                                popUpTo ("registro"){inclusive = true  }
+                            }
+                        }else{
+                            Toast.makeText(
+                                context,
+                                "Correo o contraseña incorrectos",
+                                Toast.LENGTH_SHORT).show()
                         }
-                    }else{
-                        Toast.makeText(
-                            context,
-                            "Correo o contraseña incorrectos",
-                            Toast.LENGTH_SHORT).show()
-                         }
                     }
                 }else{
                     Toast.makeText(context, "Asegurate que los campos sean correctos antes de continuar",
@@ -301,5 +300,7 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
         ) {
             Text("Registrar")
         }
+    }
+
 
 }

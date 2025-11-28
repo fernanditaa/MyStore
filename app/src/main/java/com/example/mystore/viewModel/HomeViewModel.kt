@@ -1,13 +1,11 @@
 package com.example.mystore.viewModel
 
+import android.net.Uri
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mystore.data.dao.AppDatabase
 import com.example.mystore.model.CarItem
 import com.example.mystore.model.Producto
@@ -23,7 +21,6 @@ import com.example.mystore.model.Descuento
 import com.example.mystore.model.Usuario
 import com.example.mystore.repository.DescuentoRepository
 import com.example.mystore.repository.UsuarioRepository
-import com.example.mystore.ui.theme.screen.ProductCard
 import kotlinx.coroutines.flow.collectLatest
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
@@ -63,13 +60,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         fetchDescuento()
         fetchUsuario()
 
-        registrarUsuario(
-            nombre = "Kat",
-            apellido = "Hub",
-            correo = "kathub@kathub.cl",
-            contrasena = "kathub1234",
-        onResult ={/* ignoramos el resultado */}
-        )
+        cargarUsuarioGuardado()
     }
     private fun fetchUsuario(){
         viewModelScope.launch {
@@ -136,6 +127,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                          apellido: String,
                          correo: String,
                          contrasena:String,
+                         foto: Uri?,
                          onResult:( Boolean) -> Unit
     ){
         viewModelScope.launch {
@@ -157,6 +149,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
         val usuario = usuarioRepository.validarLogin(correo, contrasena)
             _usuarioActual.value = usuario
+            if(usuario != null){
+                getApplication<Application>().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                    .edit()
+                    .putInt("usuario_id_actual", usuario.id)
+                    .apply()
+            }
         onResult (usuario != null)
         }
     }
@@ -206,7 +204,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 context.openFileOutput(fileName, Context.MODE_PRIVATE).use { fos ->
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos)
                 }
-                val actualizado = actual.copy(fotoPerfilPath =  fileName)
+                val actualizado = actual.copy(foto=  fileName)
                 usuarioRepository.actualizarUsuario(actualizado)
                 _usuarioActual.value = actualizado
                 onResult(true)
@@ -216,4 +214,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
+    private fun cargarUsuarioGuardado() {
+        viewModelScope.launch {
+            val prefs = getApplication<Application>()
+                .getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+
+            val id = prefs.getInt("usuario_id_actual", -1)
+            if (id != -1) {
+                val usuario = usuarioRepository.obtenerUsuarioPorId(id)
+                _usuarioActual.value = usuario
+            }
+        }
+    }
+
 }

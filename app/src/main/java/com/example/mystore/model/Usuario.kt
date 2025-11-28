@@ -15,5 +15,5 @@ data class Usuario(
     val contrasena: String,
     val telefono: String? = null,
     val direccion: String? = null,
-    val fotoPerfilPath: String? = null
+    val foto: String? = null
 )

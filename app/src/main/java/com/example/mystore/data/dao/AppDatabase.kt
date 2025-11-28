@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.mystore.model.Usuario
 
-@Database(entities = [Usuario::class], version = 3, exportSchema = false)
+@Database(entities = [Usuario::class], version = 4, exportSchema = false)
 abstract class AppDatabase : RoomDatabase(){
 
     abstract fun usuarioDao(): UsuarioDao
@@ -19,7 +19,7 @@ abstract class AppDatabase : RoomDatabase(){
                 Room.databaseBuilder(
                         context.applicationContext,
                     AppDatabase::class.java,
-                        "mustore_db"
+                        "mystore_db"
                         ).fallbackToDestructiveMigration()
                     .build()
                     .also { ISNTANCE = it }

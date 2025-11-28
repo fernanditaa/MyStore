@@ -21,4 +21,9 @@ class UsuarioRepository (private val usuarioDao: UsuarioDao){
         usuarioDao.actualizarUsuario(usuario)
     }
     fun obtenerUsuarios(): Flow<List<Usuario>> = usuarioDao.obtenerUsuarios()
+
+    suspend fun obtenerUsuarioPorId(id: Int): Usuario? {
+        return usuarioDao.obtenerUsuarioPorId(id)
+    }
+
 }

@@ -66,26 +66,25 @@ fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
     var isEditing by remember { mutableStateOf(false) }
 
     //creamos los datos para el usuario
-    var nombre by remember { mutableStateOf("Kat Hub") }
-    var correo by remember { mutableStateOf("kathub@kathub.cl") }
-    var telefono by remember { mutableStateOf("+56 9 4512 4512") }
-    var direccion by remember { mutableStateOf("Calle 1, 123, Maipu, Region Metropolitana") }
+    var nombre by remember { mutableStateOf("") }
+    var correo by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
+    var direccion by remember { mutableStateOf("") }
 
     LaunchedEffect(usuarioActual) {
         usuarioActual?.let{ u ->
-            nombre = u.nombre
-            correo = u.correo
-            telefono = u.telefono ?: telefono
-            direccion = u.direccion ?: direccion
+            nombre = usuarioActual?.nombre ?: nombre
+            correo = usuarioActual?.correo ?: correo
+            telefono = usuarioActual?.telefono ?: telefono
+            direccion = usuarioActual?.direccion ?: direccion
 
-            u.fotoPerfilPath?.let { path ->
+            usuarioActual?.foto?.let { path ->
                 try {
                     val input= context.openFileInput(path)
                     val bmp = BitmapFactory.decodeStream(input)
                     input.close()
                     selectedImageBitmap = bmp
                 }catch (e: Exception){
-                    e.printStackTrace()
                     selectedImageBitmap = null
                 }
             }

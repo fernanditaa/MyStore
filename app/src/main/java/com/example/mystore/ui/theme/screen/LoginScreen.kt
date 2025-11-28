@@ -133,7 +133,7 @@ fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel){
                     }
                     if (isLoading){
                         LaunchedEffect(Unit) {
-                            delay(3000L)
+                            delay(2000L)
                             navController.navigate("home") {
                                 popUpTo(navController.graph.startDestinationId) { inclusive = true }
                             }

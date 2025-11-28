@@ -19,6 +19,9 @@ interface UsuarioDao {
     @Query("SELECT * FROM usuarios WHERE correo = :correo LIMIT 1")
     suspend fun obtenerPorCorreo(correo: String): Usuario?
 
+    @Query("SELECT * FROM usuarios WHERE id = :id LIMIT 1")
+    suspend fun obtenerUsuarioPorId(id: Int): Usuario?
+
     @Query("SELECT * FROM usuarios WHERE correo = :correo AND contrasena = :contrasena LIMIT 1")
     suspend fun login(correo: String, contrasena: String): Usuario?
 

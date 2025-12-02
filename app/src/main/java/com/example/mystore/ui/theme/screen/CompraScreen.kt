@@ -408,7 +408,6 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
                         cvv.isNotBlank()
                         ){
 
-                        viewModel.limpiarCarrito()
 
                            Toast.makeText(context,"!Compra realizada con éxito¡", Toast.LENGTH_SHORT).show()
                             navController.navigate("home"){

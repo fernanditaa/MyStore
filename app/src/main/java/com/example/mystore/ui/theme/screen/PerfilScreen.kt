@@ -46,18 +46,15 @@ import androidx.compose.foundation.verticalScroll
 import android.Manifest
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.asImageBitmap
+import okhttp3.Callback
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
 
-// hay que modificar para que los datos cambien con el usuario, quedaron unos datos fijos
-
-
     //para el usuario que inicia sesion
     val usuarioActual by homeViewModel.usuarioActual.collectAsState()
-
     val context = LocalContext.current
     //Foto guardada
     var selectedImageBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -93,15 +90,6 @@ fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
             }
         }
     }
-
-    //Creamos album de imagenes locales
-    val albumImages = listOf(
-        R.drawable.imagen3,
-        R.drawable.imagen5,
-        R.drawable.imagen6,
-        R.drawable.imagen7,
-    )
-
     val scrollState = rememberScrollState()
 
     //camara
@@ -118,22 +106,15 @@ fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
         }
     }
 
-    val cameraLauncher= rememberLauncherForActivityResult(
+    val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
-        if (bitmap != null){
+        if (bitmap != null) {
             selectedImageBitmap = bitmap
-            homeViewModel.actualizarFotoPerfil(bitmap){ ok ->
-                if (bitmap != null){
-                    pendingImageBitmap = bitmap
-                }else{
-                    Toast.makeText(context,"No se cargó la imagen", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }else{
-            Toast.makeText(context, "No se obtubo imágen", Toast.LENGTH_SHORT).show()
+            pendingImageBitmap = bitmap
+        } else {
+            Toast.makeText(context, "No se obtuvo imagen", Toast.LENGTH_SHORT).show()
         }
-
     }
 
     Spacer(modifier = Modifier.height(32.dp))
@@ -276,41 +257,6 @@ fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
             }
             Spacer(modifier = Modifier.height(32.dp))
 
-            Text(
-                text = "Galería de imágenes",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp)
-            ) {
-                items(albumImages.size){ index ->
-                    val imageRes = albumImages[index]
-                    Image(
-                        painter = painterResource(id = imageRes),
-                        contentDescription = "Imagen de galería",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clip(CircleShape)
-                            .border(
-                                width = if (imageRes == selectedImageRes) 2.dp else 0.dp,
-                                color = if (imageRes == selectedImageRes)
-                                    MaterialTheme.colorScheme.primary
-                                else
-                                    MaterialTheme.colorScheme.background,
-                                shape = CircleShape
-                            )
-                            .clickable {
-                                selectedImageRes = imageRes
-                                selectedImageBitmap = null
-                            }
-                    )
-                }
-            }
 
             Button(onClick = {navController.popBackStack()},
                 modifier = Modifier.align(Alignment.CenterHorizontally)) {

@@ -44,7 +44,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel){
+fun LoginScreen(navController: NavController, homeViewModel: HomeViewModel){
 
 
     var email by remember { mutableStateOf("") }

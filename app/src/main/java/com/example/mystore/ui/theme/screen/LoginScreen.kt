@@ -39,7 +39,7 @@ import com.example.mystore.viewModel.HomeViewModel
 import kotlinx.coroutines.delay
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.material3.OutlinedTextFieldDefaults
-
+import androidx.compose.ui.platform.testTag
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,7 +94,9 @@ fun LoginScreen(navController: NavController, homeViewModel: HomeViewModel){
                         onValueChange = {email = it
                                         emailError = ""},
                         label = {Text("Correo electrónico")},
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("emailField"),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(0xFF333333),
                             unfocusedBorderColor = Color(0xFF555555)
@@ -104,7 +106,9 @@ fun LoginScreen(navController: NavController, homeViewModel: HomeViewModel){
                         value = password,
                         onValueChange = { password = it},
                         label = {Text("Contraseña")},
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("passwordField"),
                         visualTransformation = PasswordVisualTransformation(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(0xFF333333),

@@ -3,7 +3,6 @@ package com.example.mystore.viewModel
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
-import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mystore.data.dao.AppDatabase
@@ -23,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.collectLatest
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
+
 
     private val productoRepository: ProductoRepository = ProductoRepository()
     private val usuarioRepository: UsuarioRepository
@@ -86,9 +86,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun registrarUsuario(
         nombre: String,
         apellido: String,
+        telefono: String,
+        direccion: String,
         correo: String,
         contrasena: String,
-        foto: Uri?,
         onResult: (Boolean) -> Unit
     ) {
         viewModelScope.launch {

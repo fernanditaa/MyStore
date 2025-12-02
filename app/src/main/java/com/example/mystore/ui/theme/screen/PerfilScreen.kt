@@ -45,6 +45,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import android.Manifest
 import android.graphics.BitmapFactory
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.asImageBitmap
 import okhttp3.Callback
 
@@ -187,6 +188,18 @@ fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
             }
             Spacer(modifier = Modifier.height(24.dp))
 
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape =RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+
+            ){
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
             //campos para editar loos datos del usuario
 
             PerfilCampo(
@@ -216,6 +229,8 @@ fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
                 isEditing = isEditing,
                 onChange = { direccion = it}
             )
+             }
+                 }
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(

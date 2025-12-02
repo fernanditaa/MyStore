@@ -39,6 +39,15 @@ android {
     buildFeatures {
         compose = true
     }
+    packagingOptions {
+        resources {
+            excludes += listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
+                "META-INF/DEPENDENCIES"
+            )
+        }
+    }
 }
 
 dependencies {
@@ -75,6 +84,21 @@ dependencies {
 
     // Dependencia de ubicacion
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    // Kotest
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
+
+    // JUnit5
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+
+    // Mockk
+    testImplementation("io.mockk:mockk:1.13.10")
+
+    androidTestImplementation ("io.mockk:mockk-android:1.13.7")
+
+
+    androidTestImplementation("androidx.compose.ui:ui-test:1.7.4")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

@@ -13,16 +13,16 @@ abstract class AppDatabase : RoomDatabase(){
 
     companion object{
         @Volatile
-        private var ISNTANCE: AppDatabase? = null
+        private var INSTANCE: AppDatabase? = null
         fun getDatabase(context: Context): AppDatabase{
-            return ISNTANCE ?: synchronized(this){
+            return INSTANCE ?: synchronized(this){
                 Room.databaseBuilder(
                         context.applicationContext,
                     AppDatabase::class.java,
                         "mystore_db"
                         ).fallbackToDestructiveMigration()
                     .build()
-                    .also { ISNTANCE = it }
+                    .also { INSTANCE = it }
             }
         }
     }

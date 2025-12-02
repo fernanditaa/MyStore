@@ -28,7 +28,7 @@ import androidx.compose.material3.TopAppBar
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
 
-    val producto by viewModel.producto.collectAsState()
+    val producto by viewModel.productos.collectAsState()
     val categorias by viewModel.categorias.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val cartCount by viewModel.carItemCount.collectAsState()
@@ -250,7 +250,7 @@ fun CategoryScreen(
     viewModel: HomeViewModel,
     navController: NavController
 ){
-    val productos by viewModel.producto.collectAsState()//lista completa de los productos
+    val productos by viewModel.productos.collectAsState()//lista completa de los productos
     val productosFiltrados = productos.filter { it.categoriaId == categoryId }
 
     Scaffold(

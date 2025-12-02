@@ -11,20 +11,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.mystore.ui.theme.MyStoreTheme
 import com.example.mystore.ui.theme.screen.CartScreen
 import com.example.mystore.ui.theme.screen.CompraScreen
-import com.example.mystore.ui.theme.screen.DescuentosScreen
 import com.example.mystore.ui.theme.screen.HomeScreen
 import com.example.mystore.ui.theme.screen.LoginScreen
 import com.example.mystore.ui.theme.screen.WelcomeScreen
 import com.example.mystore.viewModel.HomeViewModel
 import com.example.mystore.ui.theme.screen.PerfilScreen
 import com.example.mystore.ui.theme.screen.RegistroUsuarioScreen
-
+import com.example.mystore.ui.theme.screen.CategoryScreen
 
 // Aca manejamos las rutas, donde nos lleva cada pagina
 class MainActivity : ComponentActivity() {
@@ -79,9 +80,21 @@ class MainActivity : ComponentActivity() {
                             CompraScreen(navController = navController,
                                 viewModel = sharedHomeViewModel)
                         }
-                        composable ("descuentos"){
-                            DescuentosScreen(navController = navController,
-                                viewModel = sharedHomeViewModel)
+                        composable("category/{categoryId}/{categoryName}",
+                            arguments = listOf(
+                                navArgument("categoryId"){type = NavType.IntType},
+                                navArgument("categoryName"){type = NavType.StringType}
+                            )
+                        ){backStackEntry ->
+                            val categoryId = backStackEntry.arguments?.getInt("categoryId") ?: 0
+                            val categoryName = backStackEntry.arguments?.getString("categoryName") ?: ""
+                            CategoryScreen(
+                                categoryId = categoryId,
+                                categoryName = categoryName,
+                                viewModel = sharedHomeViewModel,
+                                navController = navController
+                            )
+
                         }
                     }
                 }
@@ -89,4 +102,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-

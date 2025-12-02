@@ -1,6 +1,6 @@
 package com.example.mystore.viewModel
 
-import android.net.Uri
+import android.adservices.adid.AdId
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mystore.data.dao.AppDatabase
 import com.example.mystore.model.CarItem
+import com.example.mystore.model.Categoria
 import com.example.mystore.model.Producto
 import com.example.mystore.repository.ProductoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,25 +18,25 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import com.example.mystore.model.Descuento
 import com.example.mystore.model.Usuario
-import com.example.mystore.repository.DescuentoRepository
 import com.example.mystore.repository.UsuarioRepository
 import kotlinx.coroutines.flow.collectLatest
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val productoRepository: ProductoRepository = ProductoRepository()
-    private val descuentoRepository: DescuentoRepository = DescuentoRepository()
     private val usuarioRepository: UsuarioRepository
 
 
+    private val _categorias= MutableStateFlow<List<Categoria>>(emptyList())
+            val categorias: StateFlow<List<Categoria>> = _categorias.asStateFlow()
     private val _usuarios= MutableStateFlow<List<Usuario>>(emptyList())
     val usuarios: StateFlow<List<Usuario>> = _usuarios.asStateFlow()
     private val _productos = MutableStateFlow<List<Producto>>(emptyList())
     val producto: StateFlow<List<Producto>> = _productos.asStateFlow()
-    private val _descuentos = MutableStateFlow<List<Descuento>>(emptyList())
-    val descuento: StateFlow<List<Descuento>> = _descuentos.asStateFlow()
+
+    private val _productosfiltrados= MutableStateFlow<List<Producto>>  (emptyList())
+    var productosFiltrados: StateFlow<List<Producto>> = _productosfiltrados.asStateFlow()
     private val _carItem = MutableStateFlow<List<CarItem>>(emptyList())
     val carItem: StateFlow<List<CarItem>> = _carItem
     val carItemCount: StateFlow<Int> = _carItem.map { it.sumOf { item -> item.quantity } }.stateIn(
@@ -57,10 +58,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         usuarioRepository = UsuarioRepository(usuarioDao)
 
         fetchProducto()
-        fetchDescuento()
         fetchUsuario()
 
         cargarUsuarioGuardado()
+        cargarCategoria()
     }
     private fun fetchUsuario(){
         viewModelScope.launch {
@@ -76,30 +77,26 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
     }
-
-    private fun fetchDescuento(){
-        viewModelScope.launch {
-            _isLoading.value= true
-            try {
-                _descuentos.value = descuentoRepository.getDescuento()
-            }catch (e: Exception){
-                print("Error al cargar el descuento: ${e.localizedMessage}")
-            }finally {
-                _isLoading.value = false
-            }
-        }
-    }
     private fun fetchProducto(){
         viewModelScope.launch {
             _isLoading.value = true
             try{
                 _productos.value = productoRepository.getProducto()
+                _productosfiltrados.value =_productos.value
             }catch (e: Exception){
                 println("Error al cargar el producto: ${e.localizedMessage}")
             }finally {
                 _isLoading.value = false
             }
         }
+    }
+    fun filtrarPorCategoria(categoriaId: Int){
+        val  filtrados = if (categoriaId == 0){
+            _productos.value
+        }else{
+            _productos.value.filter { it.categoriaId == categoriaId }
+        }
+        _productosfiltrados.value = filtrados
     }
 
     fun agregarCarrito(producto: Producto){
@@ -125,15 +122,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
     fun registrarUsuario(nombre: String,
                          apellido: String,
+                         telefono: String,
+                         direccion: String,
                          correo: String,
                          contrasena:String,
-                         foto: Uri?,
                          onResult:( Boolean) -> Unit
     ){
         viewModelScope.launch {
             val nuevoUsuario = Usuario(
                 nombre = nombre,
                 apellido = apellido,
+                telefono = telefono,
+                direccion = direccion,
                 correo = correo,
                 contrasena = contrasena
             )
@@ -161,9 +161,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun actualizarPerfil(
         nombre: String,
-        correo: String,
         telefono: String,
         direccion: String,
+        correo: String,
         onResult: (Boolean) -> Unit
     ){
         viewModelScope.launch {
@@ -174,9 +174,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
             val actualiazdo = actual.copy(
                 nombre = nombre,
-                correo = correo,
                 telefono = telefono,
                 direccion= direccion,
+                correo = correo,
+
             )
             try {
                 usuarioRepository.actualizarUsuario(actualiazdo)
@@ -225,6 +226,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 _usuarioActual.value = usuario
             }
         }
+    }
+    private fun cargarCategoria(){
+        val lista = listOf(
+            Categoria(1, "Amigurumis"),
+            Categoria(2, "Souvenirs"),
+            Categoria(3, "Gorros")
+        )
+        _categorias.value = lista
     }
 
 }

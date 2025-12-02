@@ -38,7 +38,7 @@ fun CartScreen(navController: NavController, viewModel: HomeViewModel, ) {
                 modifier = Modifier.fillMaxSize().padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Su carrito está vacío.", style = MaterialTheme.typography.titleMedium)
+                Text("Su carrito está vacío.", style = MaterialTheme.typography.titleLarge)
             }
         } else {
             // 2. Mostrar la lista de ítems

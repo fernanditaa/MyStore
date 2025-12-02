@@ -1,5 +1,6 @@
 package com.example.mystore.ui.theme.screen
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -21,18 +22,23 @@ import androidx.navigation.NavController
 import com.example.mystore.model.Producto
 import com.example.mystore.viewModel.HomeViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.material3.TopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
 
     val producto by viewModel.producto.collectAsState()
+    val categorias by viewModel.categorias.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val cartCount by viewModel.carItemCount.collectAsState()
+    val categoria by viewModel.categorias.collectAsState()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    //variable para controlar el submenu de categoria
+    var categoriasExpandido by remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -56,6 +62,32 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
                     }
                 )
                 DrawerItem(
+                    title = "Categorias",
+                    icon = Icons.Default.Dashboard,
+                    onClick = { categoriasExpandido = !categoriasExpandido }
+                )
+                if(categoriasExpandido){
+                    Column(modifier = Modifier.padding(start = 16.dp)) {
+                        categorias.forEach { cat ->
+                            NavigationDrawerItem(
+                                    label ={Text(cat.nombre)},
+                                    selected = false,
+                                onClick = {
+                                    scope.launch { drawerState.close() }
+                                    //para navegar a las categorias
+                                    val  encodedName = Uri.encode(cat.nombre)
+                                    navController.navigate("category/${cat.id}/$encodedName"){
+                                        launchSingleTop = true
+                                    }
+                                },
+                                icon = {Icon(Icons.Default.Category, contentDescription = cat.nombre)},
+                                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                            )
+                        }
+                    }
+                }
+
+                DrawerItem(
                     title = "Mi Perfil",
                     icon = Icons.Default.Person,
                     onClick = { scope.launch { drawerState.close() }
@@ -63,16 +95,6 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
                             popUpTo (navController.graph.startDestinationId){inclusive = true}
                         }
                     }
-                )
-                DrawerItem(
-                    title = "Descuentos",
-                    icon = Icons.Filled.Discount,
-                    onClick = { scope.launch { drawerState.close() }
-                        navController.navigate("Descuentos"){
-                            popUpTo (navController.graph.startDestinationId){inclusive = true}
-                        }
-                    }
-
                 )
                 DrawerItem(
                     title = "Contacto",
@@ -129,6 +151,8 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 } else {
                     LazyColumn(contentPadding = PaddingValues(16.dp)) {
+
+
                         items(producto) { p ->
                             ProductCard(
                                 producto = p,
@@ -218,3 +242,48 @@ fun ProductCard(producto: Producto, onAddToCart: (Producto) -> Unit) {
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryScreen(
+    categoryId: Int,
+    categoryName: String,
+    viewModel: HomeViewModel,
+    navController: NavController
+){
+    val productos by viewModel.producto.collectAsState()//lista completa de los productos
+    val productosFiltrados = productos.filter { it.categoriaId == categoryId }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {Text(categoryName)},
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.navigate("home"){popUpTo(navController.graph.startDestinationId)} }
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription= "Volver")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        if (productosFiltrados.isEmpty()){
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ){
+                Text("No hay productos en esta categoría")
+            }
+        }else{
+            LazyColumn(contentPadding = paddingValues) {
+                items(productosFiltrados){ producto ->
+                    ProductCard(producto = producto, onAddToCart = {viewModel.agregarCarrito(producto)})
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}
+

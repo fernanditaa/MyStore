@@ -73,6 +73,9 @@ dependencies {
     // Coil para Jetpack Compose
     implementation("io.coil-kt:coil-compose:2.2.2")
 
+    // Dependencia de ubicacion
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

@@ -1,6 +1,15 @@
 package com.example.mystore.ui.theme.screen
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.widget.Button
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,12 +20,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,8 +54,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.mystore.viewModel.HomeViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.launch
 
 
@@ -102,13 +118,32 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
 
     ).count { it }
 
+    var  ubicacion by remember { mutableStateOf("") }
+
     val targetProgress = pasosCompletados / 10f
     val animatedProgress by animateFloatAsState(targetValue = targetProgress, label = "registroProgress")
+
+    // Manejo de permisos con ActivityResultLauncher
+    val permisoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            obtenerUbicacion(context) { loc ->
+                loc?.let {
+                    ubicacion = "Lat: ${it.latitude}, Lon: ${it.longitude}"
+                } ?: run {
+                    Toast.makeText(context, "No se pudo obtener la ubicación", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(context, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "Finalizazr compra",
+                title = { Text(text = "Finalizar compra",
                         style =MaterialTheme.typography.headlineSmall
                     )
                 },
@@ -143,6 +178,21 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
                 progress = { animatedProgress },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape =RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+
+            ){
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
 
             OutlinedTextField(
             value = nombre,
@@ -227,13 +277,61 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
             if (comunaError.isNotEmpty()){
                 Text(comunaError, color = Color.Red)
             }
+                    // pedimos la ubicacion
+                    OutlinedTextField(
+                        value = ubicacion,
+                        onValueChange = { ubicacion = it},
+                        label = { Text("Ubicación")},
+                        modifier = Modifier.fillMaxSize(),
+                        enabled = false
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
 
+                    Button(onClick = {
+                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED
+                        ) {
+                            // Permiso ya otorgado
+                            obtenerUbicacion(context) { loc ->
+                                loc?.let {
+                                    ubicacion = "Lat: ${it.latitude}, Lon: ${it.longitude}"
+                                } ?: run {
+                                    Toast.makeText(context, "No se pudo obtener la ubicación", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            // Pedimos permiso
+                            permisoLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                        }
+                    }) {
+                        Text("Obtener ubicación actual")
+                    }
+
+                    }
+            }
 
         Spacer(modifier = Modifier.height(24.dp))
+
+
+
         Text(
             text = "Información de pago",
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleLarge
         )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape =RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+
+            ){
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
 
         OutlinedTextField(
             value = numerotarjeta,
@@ -281,6 +379,8 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
                 Text(cvvError, color = Color.Red)
             }
         }
+         }
+            }
             Spacer(modifier = Modifier.height(40.dp))
 
             Button(
@@ -343,4 +443,17 @@ fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
 
         }
     }
+}
+@SuppressLint("PermisoLocalizacion")
+fun obtenerUbicacion(context: Context, onResult: (Location?)-> Unit){
+    val fusedLocationProviderClient: FusedLocationProviderClient=
+        LocationServices.getFusedLocationProviderClient(context)
+
+    fusedLocationProviderClient.lastLocation
+        .addOnSuccessListener { location: Location? ->
+            onResult(location)
+        }
+        .addOnFailureListener {
+            onResult(null)
+        }
 }

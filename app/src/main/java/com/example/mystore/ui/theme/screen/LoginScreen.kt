@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,9 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.mystore.viewModel.HomeViewModel
 import kotlinx.coroutines.delay
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.material3.OutlinedTextFieldDefaults
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +54,7 @@ fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel){
 
     val context = LocalContext.current
     var isLoading by remember { mutableStateOf(false) }
+
 
 
             Box(
@@ -88,14 +94,23 @@ fun LoginScreen(navController: NavController,homeViewModel: HomeViewModel){
                         onValueChange = {email = it
                                         emailError = ""},
                         label = {Text("Correo electrónico")},
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF333333),
+                            unfocusedBorderColor = Color(0xFF555555)
+                        )
                     )
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it},
                         label = {Text("Contraseña")},
                         modifier = Modifier.fillMaxWidth(),
-                        visualTransformation = PasswordVisualTransformation()
+                        visualTransformation = PasswordVisualTransformation(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF333333),
+                            unfocusedBorderColor = Color(0xFF555555)
+                        )
+
                     )
 
                     Button(

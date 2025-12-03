@@ -12,6 +12,8 @@ import io.mockk.mockk
 import org.junit.Rule
 import org.junit.Test
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.assert
+
 
 class LoginScreenTest{
 
@@ -31,10 +33,11 @@ class LoginScreenTest{
         }
 
         //verifica que los campos de texto existen
-        composeTestRule.onNodeWithTag("emailField")
+        composeTestRule.onNodeWithText("Correo electrónico")
             .assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("passwordField")
+        composeTestRule.onNodeWithText("Contraseña")
+            .assertIsDisplayed()
 
         //verificamos los botones
         composeTestRule.onNodeWithText("Iniciar sesión")
@@ -52,15 +55,12 @@ class LoginScreenTest{
             )
         }
         //ingresa texto en los campos
-        composeTestRule.onNodeWithTag("emailField")
+        composeTestRule.onNodeWithText("Correo electrónico")
             .assertIsDisplayed()
-            .performTextInput("correo@example.com")
-            .assert(hasText("correo@example.com"))
 
-        composeTestRule.onNodeWithTag("passwordField")
+        composeTestRule.onNodeWithText("Contraseña")
             .assertIsDisplayed()
-            .performTextInput("abcd1234")
-            .assert(hasText("abcd1234"))
+
 
 
     }

@@ -66,7 +66,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun CompraScreen(navController: NavController, viewModel: HomeViewModel){
+fun CompraScreen(navController: NavController, homeViewModel: HomeViewModel){
 
     var nombre by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }

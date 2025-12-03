@@ -78,7 +78,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("finalizar compra"){
                             CompraScreen(navController = navController,
-                                viewModel = sharedHomeViewModel)
+                                homeViewModel = sharedHomeViewModel)
                         }
                         composable("category/{categoryId}/{categoryName}",
                             arguments = listOf(

@@ -60,8 +60,5 @@ class LoginScreenTest{
 
         composeTestRule.onNodeWithText("Contraseña")
             .assertIsDisplayed()
-
-
-
     }
 }

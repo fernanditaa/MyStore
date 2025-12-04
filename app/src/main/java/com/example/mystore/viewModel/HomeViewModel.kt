@@ -3,6 +3,7 @@ package com.example.mystore.viewModel
 import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mystore.data.dao.AppDatabase
@@ -10,6 +11,7 @@ import com.example.mystore.model.CarItem
 import com.example.mystore.model.Categoria
 import com.example.mystore.model.Producto
 import com.example.mystore.model.Usuario
+import com.example.mystore.model.Variante
 import com.example.mystore.repository.ProductoRepository
 import com.example.mystore.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,31 +25,28 @@ import kotlinx.coroutines.flow.collectLatest
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-
     private val productoRepository: ProductoRepository = ProductoRepository()
     private val usuarioRepository: UsuarioRepository
-
     private val _categorias = MutableStateFlow<List<Categoria>>(emptyList())
     val categorias: StateFlow<List<Categoria>> = _categorias.asStateFlow()
-
     private val _usuarios = MutableStateFlow<List<Usuario>>(emptyList())
     val usuarios: StateFlow<List<Usuario>> = _usuarios.asStateFlow()
-
     private val _productos = MutableStateFlow<List<Producto>>(emptyList())
     val productos: StateFlow<List<Producto>> = _productos.asStateFlow()
-
     private val _productosFiltrados = MutableStateFlow<List<Producto>>(emptyList())
     val productosFiltrados: StateFlow<List<Producto>> = _productosFiltrados.asStateFlow()
-
     private val _carItem = MutableStateFlow<List<CarItem>>(emptyList())
     val carItem: StateFlow<List<CarItem>> = _carItem
-
     val carItemCount: StateFlow<Int> = _carItem.map { it.sumOf { item -> item.quantity } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(1000),
             initialValue = 0
         )
+
+    val carritoPorUsuario = mutableMapOf<String, List<CarItem>>()
+
+
 
     private val _usuarioActual = MutableStateFlow<Usuario?>(null)
     val usuarioActual: StateFlow<Usuario?> = _usuarioActual.asStateFlow()
@@ -96,6 +95,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val nuevoUsuario = Usuario(
                 nombre = nombre,
                 apellido = apellido,
+                telefono = telefono,
+                direccion = direccion,
                 correo = correo,
                 contrasena = contrasena
             )
@@ -230,15 +231,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     // ---- FUNCIONES DE CARRITO ----
 
-    fun agregarCarrito(producto: Producto) {
+    fun agregarCarrito(producto: Producto, variante: Variante) {
+
         val currentItems = _carItem.value.toMutableList()
-        val existItem = currentItems.find { it.producto.id == producto.id }
-        if (existItem != null) {
+        val existItem = currentItems.find {
+            it.producto.id == producto.id && it.variante == variante
+        }
+        if (existItem != null){
             val updateItem = existItem.copy(quantity = existItem.quantity + 1)
             currentItems.remove(existItem)
             currentItems.add(updateItem)
-        } else {
-            currentItems.add(CarItem(producto, 1))
+        }else{
+            currentItems.add(CarItem(producto, 1, variante))
         }
         _carItem.value = currentItems
     }
@@ -249,5 +253,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun limpiarCarrito() {
         _carItem.value = emptyList()
+    }
+
+    fun cargarCarrito(usuarioId: String){
+        _carItem.value = carritoPorUsuario[usuarioId] ?: emptyList()
+    }
+    fun guardarCarritoActual(usuarioId: String){
+        carritoPorUsuario [usuarioId] = _carItem.value
     }
 }

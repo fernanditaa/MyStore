@@ -2,9 +2,11 @@ package com.example.mystore.ui.theme.screen
 
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
@@ -122,6 +125,21 @@ fun CartItemRow(item: CarItem, onDelete:(com.example.mystore.model.Producto)-> U
 
                 Text("Precio unitario: $${item.producto.precio}",
                     style = MaterialTheme.typography.bodySmall)
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                Text( "Color", style = MaterialTheme.typography.bodySmall)
+                    Spacer(Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(15.dp)
+                            .clip(CircleShape)
+                            .background(colorFromNmae(item.variante.color))
+                    )
+                }
+
+
+                Text("Talla: ${item.variante.talla}",
+                    style = MaterialTheme.typography.bodySmall)
             }
             Text("x${item.quantity}",
                 style = MaterialTheme.typography.titleMedium)
@@ -139,5 +157,22 @@ fun CartItemRow(item: CarItem, onDelete:(com.example.mystore.model.Producto)-> U
                 )
             }
         }
+    }
+}
+
+fun colorFromNmae(name: String): Color{
+    return when(name.lowercase()){
+        "rojo" -> Color.Red
+        "azul" -> Color.Blue
+        "verde" -> Color.Green
+        "amarillo" -> Color.Yellow
+        "negro" -> Color.Black
+        "blanco" -> Color.White
+        "gris" -> Color.Gray
+        "celeste" -> Color.Cyan
+        "rosado" -> Color.Magenta
+        "pistacho" -> Color(0xFF93C572)
+        "única" -> Color.LightGray // color neutro
+        else -> Color.LightGray
     }
 }

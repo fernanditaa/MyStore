@@ -1,12 +1,17 @@
 package com.example.mystore.ui.theme.screen
 
+import android.R
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -23,12 +28,14 @@ import com.example.mystore.model.Producto
 import com.example.mystore.viewModel.HomeViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.graphics.Color
+import com.example.mystore.model.Variante
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
 
-    val producto by viewModel.productos.collectAsState()
+    val productos by viewModel.productos.collectAsState()
     val categorias by viewModel.categorias.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val cartCount by viewModel.carItemCount.collectAsState()
@@ -106,7 +113,9 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
                     title = "Cerrar Sesión",
                     icon = Icons.AutoMirrored.Filled.ExitToApp,
                     onClick = {
-                        scope.launch { drawerState.close() }
+                        scope.launch {
+                            drawerState.close()
+                        viewModel.limpiarCarrito()}
                         navController.navigate("login") {
                             popUpTo(navController.graph.startDestinationId) { inclusive = true }
                         }
@@ -150,17 +159,19 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
                 if (isLoading) {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 } else {
-                    LazyColumn(contentPadding = PaddingValues(16.dp)) {
-
-
-                        items(producto) { p ->
+                    LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(productos){producto ->
                             ProductCard(
-                                producto = p,
-                                onAddToCart = { viewModel.agregarCarrito(p) }
+                                producto = producto,
+                                onAddToCart = {producto, variante -> viewModel.agregarCarrito(producto, variante)},
+                                onClick = {}
                             )
-                            Spacer(Modifier.height(8.dp))
                         }
                     }
+
+                            Spacer(Modifier.height(8.dp))
+
+
                 }
             }
         }
@@ -183,9 +194,28 @@ fun DrawerItem(
 }
 
 @Composable
-fun ProductCard(producto: Producto, onAddToCart: (Producto) -> Unit) {
+fun ProductCard(
+    producto: Producto,
+    onAddToCart: (Producto, Variante) -> Unit,
+    onClick: () -> Unit){
 
     val context = LocalContext.current
+    val coloresDisponible = when (producto.categoriaId){
+        1 -> listOf("Única")
+        2 -> listOf("Celeste", "Rosado")
+        3 -> listOf("Blanco", "Verde", "Rojo")
+        else -> listOf("Única")
+    }
+    val tallasDisponibles = when (producto.categoriaId){
+        1 -> listOf("Única")
+        2 -> listOf("Única")
+        3 -> listOf("S", "M", "L")
+        else -> listOf("Única")
+    }
+
+    var colorSeleccionado by remember { mutableStateOf(coloresDisponible.first()) }
+    var tallaSeleccionada by remember { mutableStateOf(tallasDisponibles.first()) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -199,49 +229,96 @@ fun ProductCard(producto: Producto, onAddToCart: (Producto) -> Unit) {
                 painter = painterResource(id = producto.imagen),
                 contentDescription = producto.nombre,
                 modifier = Modifier
-                    .size(if (expanded) 500.dp else 150.dp)
-                    .clickable { expanded = !expanded },
+                    .fillMaxSize()
+                    .height(300.dp),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.height(8.dp))
+            Text(text = producto.nombre, style = MaterialTheme.typography.titleMedium)
 
-            Text(
-                text = producto.nombre,
-                style = MaterialTheme.typography.titleLarge)
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = producto.descripcion,
+                    style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = producto.medida,
+                    style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "$${producto.precio}",
+                    style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = producto.descripcion,
-                style = MaterialTheme.typography.titleMedium)
+                Text("Color:", style = MaterialTheme.typography.labelLarge)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                    coloresDisponible.forEach { color ->
+                        val boxColor = when(color.lowercase()){
+                            "celeste" -> Color.Cyan
+                            "rosado" -> Color.Magenta
+                            "blanco" -> Color.White
+                            "verde" -> Color.Green
+                            "rojo" -> Color.Red
+                            else -> Color.Gray
+                        }
+                        Box(
+                            modifier = Modifier
+                                .size(30.dp)
+                                .padding(2.dp)
+                                .background(
+                                    color = boxColor,
+                                    shape = CircleShape
+                                )
+                                .border(
+                                    width = if (color == colorSeleccionado) 2.dp else 1.dp,
+                                    color = if (color == colorSeleccionado) Color.Blue else Color.LightGray,
+                                    shape = CircleShape
+                                )
+                                .clickable { colorSeleccionado = color}
+                        )
+                    }
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = producto.medida,
-                style = MaterialTheme.typography.bodyMedium)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
+                    tallasDisponibles.forEach { talla ->
+                        OutlinedButton(
+                            onClick= { tallaSeleccionada = talla},
+                            border = BorderStroke(
+                                width = if (talla == tallaSeleccionada) 2.dp else 1.dp,
+                                color = if ( talla == tallaSeleccionada) Color.Blue else Color.Gray
+                            )
+                        ) {
+                            Text(talla)
+                        }
+                    }
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "$${producto.precio}",
-                style = MaterialTheme.typography.bodyMedium)
+                IconButton (
+                    onClick = {
+                        val  variante = Variante(
+                            color = colorSeleccionado,
+                            talla = tallaSeleccionada
+                        )
+                        onAddToCart(
+                            producto, variante)
+                        Toast.makeText(
+                            context,
+                            "${producto.nombre} agregado al carrito",
+                            Toast.LENGTH_SHORT).show()
+                    },
+                        ){
+                            Icon(
+                                imageVector = Icons.Default.ShoppingCart,
+                                contentDescription = "Añadir al carrito")
+                        }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            IconButton (
-                onClick = {onAddToCart(producto)
-                    Toast.makeText(context, "${producto.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
-                },
-            ){
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = "Añadir al carrito"
-
-                )
-            }
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryScreen(
@@ -279,7 +356,13 @@ fun CategoryScreen(
         }else{
             LazyColumn(contentPadding = paddingValues) {
                 items(productosFiltrados){ producto ->
-                    ProductCard(producto = producto, onAddToCart = {viewModel.agregarCarrito(producto)})
+                    ProductCard(
+                        producto = producto,
+                        onAddToCart = {producto, variante ->
+                            viewModel.agregarCarrito(producto, variante)
+                        },
+                        onClick = {}
+                        )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }

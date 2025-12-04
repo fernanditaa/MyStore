@@ -75,7 +75,7 @@ fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
     LaunchedEffect(usuarioActual) {
         usuarioActual?.let{ u ->
             nombre = usuarioActual?.nombre ?: nombre
-            correo = usuarioActual?.correo ?: correo
+            correo = usuarioActual?.email ?: correo
             telefono = usuarioActual?.telefono ?: telefono
             direccion = usuarioActual?.direccion ?: direccion
 
@@ -238,7 +238,7 @@ fun PerfilScreen( navController: NavController, homeViewModel: HomeViewModel) {
                     if (isEditing){
                         homeViewModel.actualizarPerfil(
                             nombre = nombre,
-                            correo = correo,
+                            email = correo,
                             telefono = telefono,
                             direccion = direccion
                         ){

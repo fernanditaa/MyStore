@@ -2,6 +2,7 @@ package com.example.mystore.ui.theme.screen
 
 import android.net.Uri
 import android.widget.Toast
+import coil.compose.AsyncImage
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import com.example.mystore.model.Producto
 import com.example.mystore.viewModel.HomeViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.material3.TopAppBar
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -195,8 +197,9 @@ fun ProductCard(producto: Producto, onAddToCart: (Producto) -> Unit) {
         Column(modifier = Modifier.padding(16.dp)) {
 
             var expanded by remember { mutableStateOf(false) }
-            Image(
-                painter = painterResource(id = producto.imagen),
+
+            AsyncImage(
+                model = producto.imagenUrl,
                 contentDescription = producto.nombre,
                 modifier = Modifier
                     .size(if (expanded) 500.dp else 150.dp)
@@ -251,7 +254,7 @@ fun CategoryScreen(
     navController: NavController
 ){
     val productos by viewModel.productos.collectAsState()//lista completa de los productos
-    val productosFiltrados = productos.filter { it.categoriaId == categoryId }
+    val productosFiltrados = productos.filter { it.categoria == categoryId }
 
     Scaffold(
         topBar = {

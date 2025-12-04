@@ -46,7 +46,7 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
     var apellido by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
-    var correo by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var contrasena by remember { mutableStateOf("") }
     var confirmarcontrasena by remember { mutableStateOf("") }
 
@@ -55,7 +55,7 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
     var apellidoError by remember { mutableStateOf("") }
     var telefonoError by remember { mutableStateOf("") }
     var direccionError by remember { mutableStateOf("") }
-    var correoError by remember { mutableStateOf("") }
+    var emailError by remember { mutableStateOf("") }
     var contrasenaError by remember { mutableStateOf("") }
     var confirmarcontrasenaError by remember { mutableStateOf("") }
 
@@ -69,12 +69,12 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
         apellido.isNotBlank(),
         telefono.isNotBlank(),
         direccion.isNotBlank(),
-        correo.isNotEmpty() && emailRegex.matches(correo),
+        email.isNotEmpty() && emailRegex.matches(email),
         contrasena.isNotEmpty() && contrasena.length >= 8 && passwordRegex.matches(contrasena),
         confirmarcontrasena.isNotEmpty() && confirmarcontrasena == contrasena
     ).count { it }
 
-    val targetProgress = pasosCompletados / 5f
+    val targetProgress = pasosCompletados / 7f
     val animatedProgress by animateFloatAsState(targetValue = targetProgress, label = "registroProgress")
 
     Column(
@@ -151,10 +151,10 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
         }
 
         OutlinedTextField(
-            value = correo,
+            value = email,
             onValueChange = {
-                correo = it
-                correoError = if (correo.isNotEmpty() && !emailRegex.matches(correo)) {
+                email = it
+                emailError = if (email.isNotEmpty() && !emailRegex.matches(email)) {
                 "Su correo debe contener @ y terminar con .cl o .com"
             }else{
                 ""
@@ -163,8 +163,8 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
             label = {Text("e-mail")},
             modifier = Modifier.fillMaxWidth()
         )
-        if (correoError.isNotEmpty()){
-            Text(correoError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+        if (emailError.isNotEmpty()){
+            Text(emailError, color = Color.Red, style = MaterialTheme.typography.bodySmall)
         }
 
         OutlinedTextField(
@@ -206,14 +206,14 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
             onClick = {
                 if(nombre.isNotEmpty()&&
                     apellido.isNotEmpty()&&
-                    correo.isNotEmpty()&&
+                    email.isNotEmpty()&&
                     telefono.isNotEmpty()&&
                     direccion.isNotEmpty()&&
                     contrasena.isNotEmpty()&&
                     confirmarcontrasena.isNotEmpty()&&
                     nombreError.isEmpty()&&
                     apellidoError.isEmpty()&&
-                    correoError.isEmpty() &&
+                    emailError.isEmpty() &&
                     contrasenaError.isEmpty()&&
                     confirmarcontrasenaError.isEmpty()
                 ){
@@ -223,7 +223,7 @@ fun RegistroUsuarioScreen(navController: NavController, homeViewModel: HomeViewM
                         apellido = apellido,
                         telefono = telefono,
                         direccion = direccion,
-                        correo = correo,
+                        email = email,
                         contrasena = contrasena
                     ){completado ->
                         if (completado){

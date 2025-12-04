@@ -123,7 +123,7 @@ fun LoginScreen(navController: NavController, homeViewModel: HomeViewModel){
                                 Toast.makeText(context,"Ingresa tu correo y contraseña", Toast.LENGTH_SHORT).show()
                             }else{
                                 homeViewModel.validarLogin(
-                                    correo = email,
+                                    email = email,
                                     contrasena = password
                                 ){
                                     valido->

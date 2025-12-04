@@ -2,25 +2,65 @@ package com.example.mystore.repository
 
 import com.example.mystore.model.Producto
 import com.example.mystore.R
+import com.example.mystore.data.dao.remote.RetrofitClient
+
 class ProductoRepository {
 
-    private val Productos = listOf(
-        Producto(1,"TurboAbuela","Personaje del anime 'DanDaDan' ",
-            "18cm",35000.0,R.drawable.turboabuela, 1),
-        Producto(2,"Recuerdo en forma de orazón","Souvenir, recuerdo para Matrimonio," +
-                " todos los souvenris son por docena", "8cm",13000.0, R.drawable.corazon, 2),
-        Producto(3,"Boina","Tejido en Lana Hipoalergenica para todo tipo de piel",
-            "22cm de circunferencia", 28000.0, R.drawable.boina, 3)
-    )
-//Devolvemos la lista de los productos con los datos simulados
-    suspend fun getProducto(): List<Producto>{
-        kotlinx.coroutines.delay(1000)// tiempo de carga de 1 segundo de espera
-        return Productos // devuelve los productos
+    private val api = RetrofitClient.instance
+
+    //obtenet todos los productos
+    suspend fun obtenerProductos(): List<Producto>{
+        return try {
+            val resp = api.obtenerProductos()
+            resp.body()?: emptyList()
+        }catch (e: Exception){
+            println("API_TEST: Error obteniendo productos: ${e.message}")
+            emptyList()
+        }
     }
 
-    // devuelve el producto por el ID
-    suspend fun getProductoById(id: Int): Producto?{
-        kotlinx.coroutines.delay(500)
-        return Productos.find { it.id == id }// busca el producto por el ID
+    //por id
+    suspend fun obtenerProductoPorId(id: Long): Producto?{
+        return try {
+            val  resp = api.obtenerPoductoPorId(id)
+            if (resp.isSuccessful) resp.body() else null
+        }catch (e: Exception){
+            println("API_TEST: Error al obtener producto por id ${e.message}")
+            null
+        }
+    }
+
+    //crear producto
+
+    suspend fun crearProducto(producto: Producto): Producto?{
+        return try {
+            val resp = api.crearProducto(producto)
+            if (resp.isSuccessful) resp.body() else null
+        }catch (e: Exception){
+            println("API_TEST: Error al crear productos ${e.message}")
+            null
+        }
+    }
+
+    //actualizar
+    suspend fun actualizarProducto(id: Long, producto: Producto): Producto?{
+        return try {
+            val resp = api.actualizarProducto(id, producto)
+            if (resp.isSuccessful) resp.body() else null
+        }catch (e: Exception){
+            println("API_TEST: Error al actualizar productos ${e.message}")
+            null
+        }
+    }
+
+    //Eliminar
+    suspend fun eliminarProducto(id: Long): Boolean{
+        return try {
+            val resp = api.eliminarProducto(id)
+            resp.isSuccessful
+        }catch (e: Exception){
+            println("API_TEST: Error al eliminar productos ${e.message}")
+            false
+        }
     }
 }

@@ -26,22 +26,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val productoRepository: ProductoRepository = ProductoRepository()
     private val usuarioRepository: UsuarioRepository
-
     private val _categorias = MutableStateFlow<List<Categoria>>(emptyList())
     val categorias: StateFlow<List<Categoria>> = _categorias.asStateFlow()
-
     private val _usuarios = MutableStateFlow<List<Usuario>>(emptyList())
     val usuarios: StateFlow<List<Usuario>> = _usuarios.asStateFlow()
-
     private val _productos = MutableStateFlow<List<Producto>>(emptyList())
     val productos: StateFlow<List<Producto>> = _productos.asStateFlow()
-
     private val _productosFiltrados = MutableStateFlow<List<Producto>>(emptyList())
     val productosFiltrados: StateFlow<List<Producto>> = _productosFiltrados.asStateFlow()
-
     private val _carItem = MutableStateFlow<List<CarItem>>(emptyList())
     val carItem: StateFlow<List<CarItem>> = _carItem
-
     val carItemCount: StateFlow<Int> = _carItem.map { it.sumOf { item -> item.quantity } }
         .stateIn(
             scope = viewModelScope,
@@ -72,9 +66,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                usuarioRepository.obtenerUsuarios().collectLatest { lista ->
-                    _usuarios.value = lista
-                }
+                val lista = usuarioRepository.obtenerUsuarios()
+                _usuarios.value = lista
             } catch (e: Exception) {
                 println("Error al cargar usuarios: ${e.localizedMessage}")
             } finally {
@@ -88,7 +81,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         apellido: String,
         telefono: String,
         direccion: String,
-        correo: String,
+        email: String,
         contrasena: String,
         onResult: (Boolean) -> Unit
     ) {
@@ -96,12 +89,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val nuevoUsuario = Usuario(
                 nombre = nombre,
                 apellido = apellido,
-                correo = correo,
+                telefono = telefono,
+                direccion = direccion,
+                email = email,
                 contrasena = contrasena
             )
             val completado = usuarioRepository.registrarUsuario(nuevoUsuario)
             if (completado) {
-                val usuarioGuardado = usuarioRepository.validarLogin(correo, contrasena)
+                val usuarioGuardado = usuarioRepository.validarLogin(email, contrasena)
                 _usuarioActual.value = usuarioGuardado
                 usuarioGuardado?.let { u ->
                     getApplication<Application>().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
@@ -114,9 +109,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun validarLogin(correo: String, contrasena: String, onResult: (Boolean) -> Unit) {
+    fun validarLogin(email: String, contrasena: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            val usuario = usuarioRepository.validarLogin(correo, contrasena)
+            val usuario = usuarioRepository.validarLogin(email, contrasena)
             _usuarioActual.value = usuario
             if (usuario != null) {
                 getApplication<Application>().getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
@@ -130,7 +125,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun actualizarPerfil(
         nombre: String,
-        correo: String,
+        email: String,
         telefono: String,
         direccion: String,
         onResult: (Boolean) -> Unit
@@ -143,7 +138,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }
             val actualizado = actual.copy(
                 nombre = nombre,
-                correo = correo,
+                email = email,
                 telefono = telefono,
                 direccion = direccion
             )
@@ -184,12 +179,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun cargarUsuarioGuardado() {
         viewModelScope.launch {
-            val prefs = getApplication<Application>()
+            val  prefs = getApplication<Application>()
                 .getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
             val id = prefs.getInt("usuario_id_actual", -1)
-            if (id != -1) {
+            if (id != -1){
                 val usuario = usuarioRepository.obtenerUsuarioPorId(id)
                 _usuarioActual.value = usuario
+            }else{
+                _usuarioActual.value = null
             }
         }
     }
@@ -209,8 +206,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _productos.value = productoRepository.getProducto()
-                _productosFiltrados.value = _productos.value
+                val lista = productoRepository.obtenerProductos()
+                _productos.value = lista
+                _productosFiltrados.value = lista
             } catch (e: Exception) {
                 println("Error al cargar productos: ${e.localizedMessage}")
             } finally {
@@ -219,11 +217,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun filtrarPorCategoria(categoriaId: Int) {
-        val filtrados = if (categoriaId == 0) {
+    fun filtrarPorCategoria(categoria: Int) {
+        val filtrados = if (categoria == 0) {
             _productos.value
         } else {
-            _productos.value.filter { it.categoriaId == categoriaId }
+            _productos.value.filter { it.categoria == categoria }
         }
         _productosFiltrados.value = filtrados
     }

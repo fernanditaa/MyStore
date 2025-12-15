@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.mystore"
-        minSdk = 36
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -29,6 +29,31 @@ android {
             )
         }
     }
+    //configuracion de firma de APK (keystore local)
+    signingConfigs{
+        create("release"){
+            storeFile = file("../keystore/mystore-release.jks")
+            storePassword = "mystore1234"
+            keyAlias = "key0"
+            keyPassword = "mystore1234"
+        }
+    }
+
+    buildTypes{
+        release {
+            isMinifyEnabled = false
+
+            //firma del buil release usando el keystore de arriba
+            signingConfig = signingConfigs.getByName("release")
+
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

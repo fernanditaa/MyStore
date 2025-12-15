@@ -410,6 +410,7 @@ fun CompraScreen(navController: NavController, homeViewModel: HomeViewModel){
 
 
                            Toast.makeText(context,"!Compra realizada con éxito¡", Toast.LENGTH_SHORT).show()
+                            homeViewModel.limpiarCarrito()
                             navController.navigate("home"){
                                 popUpTo("home"){inclusive = true} }
 

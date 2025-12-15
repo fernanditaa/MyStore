@@ -26,6 +26,7 @@ import com.example.mystore.viewModel.HomeViewModel
 import com.example.mystore.ui.theme.screen.PerfilScreen
 import com.example.mystore.ui.theme.screen.RegistroUsuarioScreen
 import com.example.mystore.ui.theme.screen.CategoryScreen
+import com.example.mystore.ui.theme.screen.ContactoScreen
 
 // Aca manejamos las rutas, donde nos lleva cada pagina
 class MainActivity : ComponentActivity() {
@@ -80,6 +81,9 @@ class MainActivity : ComponentActivity() {
                             CompraScreen(navController = navController,
                                 homeViewModel = sharedHomeViewModel)
                         }
+                        composable ("Contacto"){
+                            ContactoScreen(navController = navController, homeViewModel = sharedHomeViewModel)
+                        }
                         composable("category/{categoryId}/{categoryName}",
                             arguments = listOf(
                                 navArgument("categoryId"){type = NavType.IntType},
@@ -96,6 +100,7 @@ class MainActivity : ComponentActivity() {
                             )
 
                         }
+
                     }
                 }
             }

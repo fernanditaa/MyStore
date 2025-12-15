@@ -2,19 +2,22 @@ package com.example.mystore
 
 import android.app.Application
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
-import com.example.mystore.ui.theme.screen.HomeScreen
+import com.example.mystore.ui.theme.screen.ContactoScreen
 import com.example.mystore.viewModel.HomeViewModel
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class HomeScreenTest {
+class ContactoScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -27,52 +30,36 @@ class HomeScreenTest {
         dummyViewModel = HomeViewModel(app)
     }
     @Test
-    fun HomeScreenTest() {
+    fun ContactoScreenTest(){
         composeTestRule.setContent {
-            HomeScreen(
+            ContactoScreen(
                 navController = rememberNavController(),
-                viewModel = dummyViewModel
+                homeViewModel =  dummyViewModel
             )
         }
-
-        composeTestRule.onNodeWithText("KatHub")
-            .assertIsDisplayed()
-
-        composeTestRule.onNodeWithContentDescription("Abrir Menú")
-            .assertIsDisplayed()
-
-        composeTestRule.onNodeWithContentDescription("Carrito")
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun abreElMenuYPruebaSusDatos(){
-        composeTestRule.setContent {
-            HomeScreen(
-                navController = rememberNavController(),
-                viewModel = dummyViewModel
-            )
-        }
-
-        composeTestRule.onNodeWithContentDescription("Abrir Menú")
-            .performClick()
-
-        composeTestRule.onNodeWithText("Menú KatHub")
-            .assertIsDisplayed()
-
-        composeTestRule.onNodeWithText("Inicio")
-            .assertIsDisplayed()
-
-        composeTestRule.onNodeWithText("Categorias")
-            .assertIsDisplayed()
-
-        composeTestRule.onNodeWithText("Mi Perfil")
-            .assertIsDisplayed()
 
         composeTestRule.onNodeWithText("Contacto")
             .assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("Cerrar Sesión")
+        composeTestRule.onNodeWithText(
+            "Si necesitas comunicarte con nosotros solo dejanos un mensaje describiendo tu problema y en la brevedad nos comunicaremos contigo")
+            .assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Nombres")
+            .assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Correo electrónico")
+            .assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("Mensaje")
+            .assertIsDisplayed()
+
+        composeTestRule.onNodeWithText("enviar mensaje")
+            .assertIsDisplayed()
+
+        composeTestRule.onNodeWithContentDescription("Volver")
             .assertIsDisplayed()
     }
+
+
 }

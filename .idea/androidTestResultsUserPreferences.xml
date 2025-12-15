@@ -50,6 +50,7 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_7_Pro" value="120" />
+                  <entry key="Pixel_9_Pro" value="120" />
                   <entry key="Tests" value="360" />
                 </map>
               </option>
@@ -63,6 +64,19 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Resizable_Experimental" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="-492487204">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Pixel_9_Pro" value="120" />
                   <entry key="Tests" value="360" />
                 </map>
               </option>
@@ -90,6 +104,19 @@
                 <map>
                   <entry key="Duration" value="90" />
                   <entry key="Pixel_9" value="120" />
+                  <entry key="Tests" value="360" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="740686136">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="Duration" value="90" />
+                  <entry key="Pixel_9_Pro" value="120" />
                   <entry key="Tests" value="360" />
                 </map>
               </option>

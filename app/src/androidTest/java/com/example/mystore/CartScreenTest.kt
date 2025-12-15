@@ -11,6 +11,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import androidx.test.core.app.ApplicationProvider
 import com.example.mystore.model.Producto
+import com.example.mystore.model.Variante
 import com.example.mystore.ui.theme.screen.CartScreen
 import com.example.mystore.ui.theme.screen.CompraScreen
 import com.example.mystore.viewModel.HomeViewModel
@@ -65,7 +66,12 @@ class CartScreenTest {
             1
         )
 
-        dummyViewModel.agregarCarrito(producto)
+        val variante = Variante(
+            color = "rojo",
+            talla = "unico"
+        )
+
+        dummyViewModel.agregarCarrito(producto, variante)
 
         composeTestRule.setContent {
             CartScreen(
@@ -87,5 +93,7 @@ class CartScreenTest {
 
         composeTestRule.onNodeWithContentDescription("Eliminar producto")
             .assertIsDisplayed()
+
+
     }
 }

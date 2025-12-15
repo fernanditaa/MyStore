@@ -106,7 +106,11 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
                 DrawerItem(
                     title = "Contacto",
                     icon = Icons.Default.Contacts,
-                    onClick = { scope.launch { drawerState.close()} /* navegar a profile */ }
+                    onClick = { scope.launch { drawerState.close()}
+                    navController.navigate("Contacto"){
+                            popUpTo(navController.graph.startDestinationId){inclusive = true}
+                        }
+                    }
                 )
 
                 DrawerItem(

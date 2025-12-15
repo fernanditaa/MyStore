@@ -123,6 +123,11 @@ fun CartItemRow(item: CarItem, onDelete:(com.example.mystore.model.Producto)-> U
                 Text(item.producto.nombre,
                     style = MaterialTheme.typography.titleMedium)
 
+                Text(
+                    text = "Categoría: ${item.producto.categoriaId}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+
                 Text("Precio unitario: $${item.producto.precio}",
                     style = MaterialTheme.typography.bodySmall)
 
